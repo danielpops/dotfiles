@@ -101,4 +101,4 @@ if [ -f `brew --prefix`/etc/bash_completion.d/git-completion.bash ]; then
 fi
 
 # Shell Customizations
-export PS1="\[$BPurple\]\u@\[$BGreen\]\h:\[$BYellow\]\w \[$Cyan\]\$(__git_ps1)\r\n\[$Color_Off\]\\$ "
+export PS1="\[$BPurple\]\u@\[$BGreen\]\h:\[$BYellow\]\w \[$BCyan\]\$(__git_ps1)\r\n\[$Color_Off\]\\$ "
