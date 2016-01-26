@@ -81,9 +81,14 @@ On_IPurple='\e[0;105m'  # Purple
 On_ICyan='\e[0;106m'    # Cyan
 On_LightBlue='\e[0:110m' # Light Blue
 
+
+FancyX='\342\234\227'
+Checkmark='\342\234\223'
+
 # Environment Variables
 export CLICOLOR=1
 export LSCOLORS=ExFxBxDxCxegedabagacad
+export PATH="/usr/local/sbin:$PATH"
 
 # Aliases
 alias glga="git log --graph --abbrev-commit --date=short --pretty=format:\
@@ -92,7 +97,7 @@ alias myprocs="ps aux | grep \"^dpopes\" | grep -v grep | grep -v \"^ps aux\""
 alias ls="ls -GFh"
 alias irclogs="cd ~/Library/Application\ Support/Adium\ 2.0/Users/Default/Logs/IRC.$USER"
 alias ..="cd .."
-alias __git_ps1="git branch 2>/dev/null | grep '*' | sed 's/* \(.*\)/(\1)/'"
+#alias __git_ps1="git branch 2>/dev/null | grep '*' | sed 's/* \(.*\)/(\1)/'"
 
 # Git Bash Autocomplete / Prompt support
 
@@ -100,5 +105,15 @@ if [ -f `brew --prefix`/etc/bash_completion.d/git-completion.bash ]; then
   . `brew --prefix`/etc/bash_completion.d/git-completion.bash
 fi
 
+if [ -f `brew --prefix`/etc/bash_completion.d/git-prompt.sh ]; then
+  . `brew --prefix`/etc/bash_completion.d/git-prompt.sh
+fi
+
 # Shell Customizations
-export PS1="\[$BPurple\]\u@\[$BGreen\]\h:\[$BYellow\]\w \[$BCyan\]\$(__git_ps1)\r\n\[$Color_Off\]\\$ "
+export PS1="\[$BPurple\]\u@\[$BGreen\]\h:\[$BYellow\]\w\[$BCyan\]\$(__git_ps1)\r\n\[$Color_Off\]\\$ "
+
+
+# Try to re-mount the dev35-devc dpopes home directory (may fail if already mounted, but doesn't hurt)
+sshfs -o reconnect dpopes@dev35-devc:/nail/home/dpopes/ ~/dev/dev35-devc 2>/dev/null
+# Keeping the 'unmount' command here for reference:
+# diskutil unmountDisk force /Volumes/DISK_NAME
