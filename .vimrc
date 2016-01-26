@@ -62,3 +62,6 @@ set title
 
 " Don't show intro message when starting Vim
 set shortmess=atI
+
+" Auto-load modifications to opened files
+set autoread
