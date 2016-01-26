@@ -47,3 +47,18 @@ imap <Tab> <C-P>
 imap <S-Tab> <C-N>
 nnoremap <CR> :nohlsearch<CR><CR>
 nnoremap <silent> <Space> :nohlsearch<Bar>:echo<CR>
+
+" Highlight Current Line
+set cursorline
+
+" Highlight dynamically as pattern is typed
+set incsearch
+
+" Show partial commands as they're typed
+set showcmd
+
+" Show the filename in the window title
+set title
+
+" Don't show intro message when starting Vim
+set shortmess=atI
