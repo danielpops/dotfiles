@@ -96,14 +96,6 @@ alias irclogs="cd ~/Library/Application\ Support/Adium\ 2.0/Users/Default/Logs/I
 alias ..="cd .."
 alias __git_ps1="git branch 2>/dev/null | grep '*' | sed 's/* \(.*\)/(\1)/'"
 
-# Git Bash Autocomplete / Prompt support
-
-if [ -f `brew --prefix`/etc/bash_completion.d/git-completion.bash ]; then
-  . `brew --prefix`/etc/bash_completion.d/git-completion.bash
-fi
-
-
-
 alias ls="ls -GFh"
 
 # Shell Customizations
