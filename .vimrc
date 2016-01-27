@@ -59,6 +59,8 @@ set showcmd
 
 " Show the filename in the window title
 set title
+set titleold=""
+set titlestring=VIM:\ %F
 
 " Don't show intro message when starting Vim
 set shortmess=atI
