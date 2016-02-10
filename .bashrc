@@ -96,7 +96,8 @@ platform="unknown"
 # Aliases
 alias glga="git log --graph --abbrev-commit --date=short --pretty=format:\
 '%C(yellow)%h%Creset %C(bold blue)(%an)%Creset%C(yellow)%d%Creset %s %Cgreen<%cr, %ar>%Creset'"
-alias myprocs="ps aux | grep \"^dpopes\" | grep -v grep | grep -v \"^ps aux\"" 
+alias grep="grep --color=auto"
+alias myprocs="ps aux | grep -v grep | grep -v \"^ps aux\" | grep \"^$(whoami)\""
 alias irclogs="cd ~/Library/Application\ Support/Adium\ 2.0/Users/Default/Logs/IRC.$USER"
 alias ..="cd .."
 #alias __git_ps1="git branch 2>/dev/null | grep '*' | sed 's/* \(.*\)/(\1)/'"
