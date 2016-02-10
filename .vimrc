@@ -67,3 +67,9 @@ set shortmess=atI
 
 " Auto-load modifications to opened files
 set autoread
+
+" Show the file percentage progress
+set ruler
+
+" Always show filename in bottom 'ruler' row
+set laststatus=2
