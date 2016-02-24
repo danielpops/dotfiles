@@ -43,8 +43,6 @@ set hlsearch
 :command Wq wq
 :command W w
 :command Q q
-imap <Tab> <C-P>
-imap <S-Tab> <C-N>
 nnoremap <CR> :nohlsearch<CR><CR>
 nnoremap <silent> <Space> :nohlsearch<Bar>:echo<CR>
 
@@ -59,9 +57,17 @@ set showcmd
 
 " Show the filename in the window title
 set title
+set titleold=""
+set titlestring=VIM:\ %F
 
 " Don't show intro message when starting Vim
 set shortmess=atI
 
 " Auto-load modifications to opened files
 set autoread
+
+" Pathogen
+"execute pathogen#infect()
+"filetype off
+"filetype plugin indent on
+
