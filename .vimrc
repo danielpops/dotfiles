@@ -71,3 +71,8 @@ set autoread
 "filetype off
 "filetype plugin indent on
 
+" Show the file percentage progress
+set ruler
+
+" Always show filename in bottom 'ruler' row
+set laststatus=2
