@@ -1,4 +1,9 @@
-echo Loading ~/.bashrc
+# Only echo the text if it is an interactive shell (e.g. a real human logging in)
+# Otherwise, some automated tasks may fail when they receive the unexpected text
+# e.g. rsync, sshfs type things, etc...
+if [ ! -z "$PS1" ]; then
+    echo Loading ~/.bashrc
+fi
 
 # Colors
 
@@ -104,15 +109,23 @@ alias ..="cd .."
 
 alias ls="ls -GFh"
 
-if [ -f `brew --prefix`/etc/bash_completion.d/git-prompt.sh ]; then
-  . `brew --prefix`/etc/bash_completion.d/git-prompt.sh
-fi
+# If brew is installed, when use it ensure bash completion and git prompt completion
+which brew > /dev/null
+if [ $? == 0 ]; then
+    if [ -f `brew --prefix`/etc/bash_completion.d/git-prompt.sh ]; then
+      . `brew --prefix`/etc/bash_completion.d/git-prompt.sh
+    fi
+    if [ -f $(brew --prefix)/etc/bash_completion ]; then
+      . $(brew --prefix)/etc/bash_completion
+    fi
 
+fi
 # Shell Customizations
 export PS1="\[$BPurple\]\u@\[$BGreen\]\h:\[$BYellow\]\w\[$BCyan\]\$(__git_ps1)\r\n\[$Color_Off\]\\$ "
 
 
 # Try to re-mount the dev35-devc dpopes home directory (may fail if already mounted, but doesn't hurt)
+# This is too specific to my work dev laptop.  Consider removing it or addressing it some other way
 sshfs -o reconnect dpopes@dev35-devc:/nail/home/dpopes/ ~/dev/dev35-devc 2>/dev/null
 # Keeping the 'unmount' command here for reference:
 # diskutil unmountDisk force /Volumes/DISK_NAME
