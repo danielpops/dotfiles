@@ -43,8 +43,6 @@ set hlsearch
 :command Wq wq
 :command W w
 :command Q q
-imap <Tab> <C-P>
-imap <S-Tab> <C-N>
 nnoremap <CR> :nohlsearch<CR><CR>
 nnoremap <silent> <Space> :nohlsearch<Bar>:echo<CR>
 
@@ -67,3 +65,14 @@ set shortmess=atI
 
 " Auto-load modifications to opened files
 set autoread
+
+" Pathogen
+"execute pathogen#infect()
+"filetype off
+"filetype plugin indent on
+
+" Show the file percentage progress
+set ruler
+
+" Always show filename in bottom 'ruler' row
+set laststatus=2
