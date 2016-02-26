@@ -119,19 +119,24 @@ platform="unknown"
 alias glga="git log --graph --abbrev-commit --date=short --pretty=format:\
 '%C(yellow)%h%Creset %C(bold blue)(%an)%Creset%C(yellow)%d%Creset %s %Cgreen<%cr, %ar>%Creset'"
 alias grep="grep --color=auto"
-alias myprocs="ps aux | grep -v grep | grep -v \"^ps aux\" | grep \"^$(whoami)\""
-alias irclogs="cd ~/Library/Application\ Support/Adium\ 2.0/Users/Default/Logs/IRC.$USER"
+alias myprocs="ps aux | grep -v grep | grep -v \"^ps aux\" | grep -P \"^$(whoami)\s+\d+\""
 alias ..="cd .."
 #alias __git_ps1="git branch 2>/dev/null | grep '*' | sed 's/* \(.*\)/(\1)/'"
 
-# On mac, the ls alias to make the colors look pretty is different than on linux
 if [ $mac == true ]; then
+    # On mac, the ls alias to make the colors look pretty is different than on linux
     alias ls="ls -GFh"
+
+    # On mac, this is where the Adium irc logs go.  It's an annoying path to remember otherwise.
+    alias irclogs="cd ~/Library/Application\ Support/Adium\ 2.0/Users/Default/Logs/IRC.$USER"
 fi
 
-# On linux, the ls alias to make the colors look pretty is different than on mac
 if [ $linux == true ]; then
+    # On linux, the ls alias to make the colors look pretty is different than on mac
     alias ls='ls --color=tty -Fh'
+
+    # Ignore disabled test suites if we're using testify.  Ain't nobody got time for dat!
+    alias testify='testify -x disabled'
 fi
 
 # Check if brew is installed
@@ -139,11 +144,15 @@ which brew > /dev/null
 if [ $? == 0 ]; then
     # Since brew is installed, check for a few things that we like to use
     # such as bash completion and git prompt completion
+
     brew_path=$(brew --prefix)
     git_prompt=$brew_path/etc/bash_completion.d/git-prompt.sh
     if [ -a $git_prompt ]; then
         . $git_prompt
     fi
+
+    # TODO: Add an 'else' here that does the brew install of those nice things that you like
+
     bash_completion=$brew_path/etc/bash_completion
     if [ -a $bash_completion ]; then
       . $bash_completion
