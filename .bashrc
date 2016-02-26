@@ -5,6 +5,24 @@ if [ ! -z "$PS1" ]; then
     echo Loading ~/.bashrc
 fi
 
+# Figure out what kind of machine we're running on,
+# since some customizations are different on mac vs linux
+platform=$(uname)
+mac=false
+linux=false
+unknown=false
+
+if [ $platform=='Darwin' ]; then
+    platform='osx'
+    mac=true
+elif [ $platform=='Linux' ]; then
+    platform='linux'
+    linux=true
+else
+    platform='unknown'
+    unknown=true
+fi
+
 # Colors
 
 # Reset
@@ -86,7 +104,6 @@ On_IPurple='\e[0;105m'  # Purple
 On_ICyan='\e[0;106m'    # Cyan
 On_LightBlue='\e[0:110m' # Light Blue
 
-
 FancyX='\342\234\227'
 Checkmark='\342\234\223'
 
@@ -107,16 +124,29 @@ alias irclogs="cd ~/Library/Application\ Support/Adium\ 2.0/Users/Default/Logs/I
 alias ..="cd .."
 #alias __git_ps1="git branch 2>/dev/null | grep '*' | sed 's/* \(.*\)/(\1)/'"
 
-alias ls="ls -GFh"
+# On mac, the ls alias to make the colors look pretty is different than on linux
+if [ $mac == true ]; then
+    alias ls="ls -GFh"
+fi
 
-# If brew is installed, when use it ensure bash completion and git prompt completion
+# On linux, the ls alias to make the colors look pretty is different than on mac
+if [ $linux == true ]; then
+    alias ls='ls --color=tty -Fh'
+fi
+
+# Check if brew is installed
 which brew > /dev/null
 if [ $? == 0 ]; then
-    if [ -f `brew --prefix`/etc/bash_completion.d/git-prompt.sh ]; then
-      . `brew --prefix`/etc/bash_completion.d/git-prompt.sh
+    # Since brew is installed, check for a few things that we like to use
+    # such as bash completion and git prompt completion
+    brew_path=$(brew --prefix)
+    git_prompt=$brew_path/etc/bash_completion.d/git-prompt.sh
+    if [ -a $git_prompt ]; then
+        . $git_prompt
     fi
-    if [ -f $(brew --prefix)/etc/bash_completion ]; then
-      . $(brew --prefix)/etc/bash_completion
+    bash_completion=$brew_path/etc/bash_completion
+    if [ -a $bash_completion ]; then
+      . $bash_completion
     fi
 
 fi
