@@ -1,9 +1,15 @@
+#!/bin/bash
+
 # Only echo the text if it is an interactive shell (e.g. a real human logging in)
 # Otherwise, some automated tasks may fail when they receive the unexpected text
 # e.g. rsync, sshfs type things, etc...
-if [ ! -z "$PS1" ]; then
-    echo Loading ~/.bashrc
-fi
+cprint() {
+    if [ ! -z "$PS1" ]; then
+        echo $*
+    fi
+}
+
+cprint "Loading ~/.bashrc"
 
 # Figure out what kind of machine we're running on,
 # since some customizations are different on mac vs linux
@@ -13,12 +19,15 @@ linux=false
 unknown=false
 
 if [ $platform = 'Darwin' ]; then
+    cprint "uname==>$platform so we must be running on a mac"
     platform='osx'
     mac=true
 elif [ $platform = 'Linux' ]; then
+    cprint "uname==>$platform so we must be running on a linux machine"
     platform='linux'
     linux=true
 else
+    cprint "uname==>$platform so we don't know what state we're in!"
     platform='unknown'
     unknown=true
 fi
@@ -111,9 +120,6 @@ Checkmark='\342\234\223'
 export CLICOLOR=1
 export LSCOLORS=ExFxBxDxCxegedabagacad
 export PATH="/usr/local/sbin:$PATH"
-
-# Local variables (used in this script only)
-platform="unknown"
 
 # Aliases
 alias glga="git log --graph --abbrev-commit --date=short --pretty=format:\
