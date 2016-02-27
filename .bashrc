@@ -12,10 +12,10 @@ mac=false
 linux=false
 unknown=false
 
-if [ $platform=='Darwin' ]; then
+if [ $platform = 'Darwin' ]; then
     platform='osx'
     mac=true
-elif [ $platform=='Linux' ]; then
+elif [ $platform = 'Linux' ]; then
     platform='linux'
     linux=true
 else
@@ -123,15 +123,19 @@ alias myprocs="ps aux | grep -v grep | grep -v \"^ps aux\" | grep -P \"^$(whoami
 alias ..="cd .."
 #alias __git_ps1="git branch 2>/dev/null | grep '*' | sed 's/* \(.*\)/(\1)/'"
 
-if [ $mac == true ]; then
+if [ $mac = true ]; then
     # On mac, the ls alias to make the colors look pretty is different than on linux
     alias ls="ls -GFh"
 
     # On mac, this is where the Adium irc logs go.  It's an annoying path to remember otherwise.
     alias irclogs="cd ~/Library/Application\ Support/Adium\ 2.0/Users/Default/Logs/IRC.$USER"
+
+    # Shell Customizations should basically only need to happen on the mac.
+    # The linux boxes i typically use already have them set up
+    export PS1="\[$BPurple\]\u@\[$BGreen\]\h:\[$BYellow\]\w\[$BCyan\]\$(__git_ps1)\r\n\[$Color_Off\]\\$ "
 fi
 
-if [ $linux == true ]; then
+if [ $linux = true ]; then
     # On linux, the ls alias to make the colors look pretty is different than on mac
     alias ls='ls --color=tty -Fh'
 
@@ -141,7 +145,7 @@ fi
 
 # Check if brew is installed
 which brew > /dev/null
-if [ $? == 0 ]; then
+if [ $? = 0 ]; then
     # Since brew is installed, check for a few things that we like to use
     # such as bash completion and git prompt completion
 
@@ -159,9 +163,6 @@ if [ $? == 0 ]; then
     fi
 
 fi
-# Shell Customizations
-export PS1="\[$BPurple\]\u@\[$BGreen\]\h:\[$BYellow\]\w\[$BCyan\]\$(__git_ps1)\r\n\[$Color_Off\]\\$ "
-
 
 # Try to re-mount the dev35-devc dpopes home directory (may fail if already mounted, but doesn't hurt)
 # This is too specific to my work dev laptop.  Consider removing it or addressing it some other way
