@@ -1,4 +1,4 @@
-echo Loading ~/.bash_profile
+echo "Loading ~/.bash_profile"
 
 # If the ~/.bashrc file exists, then load it
 if [ -f ~/.bashrc ]; then
