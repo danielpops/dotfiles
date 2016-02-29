@@ -158,19 +158,19 @@ if [ $? = 0 ]; then
     brew_path=$(brew --prefix)
     git_prompt=$brew_path/etc/bash_completion.d/git-prompt.sh
     if [ ! -f $git_prompt ]; then
-        echo "Couldn't find bash-git-prompt script at $git_prompt.  Installing it now..."
+        cprint "Couldn't find bash-git-prompt script at $git_prompt --> Installing it now..."
         brew install bash-git-prompt
     else
-        echo "Found bash-git-prompt script at $git_prompt.  Sourcing it now..."
+        cprint "Found bash-git-prompt script at $git_prompt --> Sourcing it now..."
         . $git_prompt
     fi
 
     bash_completion=$brew_path/etc/bash_completion
     if [ ! -f $bash_completion ]; then
-        echo "Couldn't find bash_completion script.  Installing it now..."
+        cprint "Couldn't find bash_completion script --> Installing it now..."
         brew install bash-completion
     else
-        echo "Found bash-completion script at $bash_completion.  Sourcing it now..."
+        cprint "Found bash-completion script at $bash_completion --> Sourcing it now..."
       . $bash_completion
     fi
 
