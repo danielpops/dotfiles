@@ -119,7 +119,7 @@ platform="unknown"
 alias glga="git log --graph --abbrev-commit --date=short --pretty=format:\
 '%C(yellow)%h%Creset %C(bold blue)(%an)%Creset%C(yellow)%d%Creset %s %Cgreen<%cr, %ar>%Creset'"
 alias grep="grep --color=auto"
-alias myprocs="ps aux | grep -v grep | grep -v \"^ps aux\" | grep -P \"^$(whoami)\s+\d+\""
+alias myprocs="ps aux | grep -v grep | grep -v \"ps aux\" | grep -P \"^$(whoami)\s+\d+\""
 alias ..="cd .."
 #alias __git_ps1="git branch 2>/dev/null | grep '*' | sed 's/* \(.*\)/(\1)/'"
 
