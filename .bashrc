@@ -147,6 +147,9 @@ if [ $linux = true ]; then
 
     # Ignore disabled test suites if we're using testify.  Ain't nobody got time for dat!
     alias testify='testify -x disabled'
+
+    # The linux boxes i typically use already has a PS1 setup.  However, i prefer the additional newline
+    export PS1="$PS1\n$ "
 fi
 
 # Check if brew is installed
