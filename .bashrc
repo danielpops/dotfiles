@@ -1,9 +1,15 @@
+#!/bin/bash
+
 # Only echo the text if it is an interactive shell (e.g. a real human logging in)
 # Otherwise, some automated tasks may fail when they receive the unexpected text
 # e.g. rsync, sshfs type things, etc...
-if [ ! -z "$PS1" ]; then
-    echo Loading ~/.bashrc
-fi
+cprint() {
+    if [ ! -z "$PS1" ]; then
+        echo $*
+    fi
+}
+
+cprint "Loading ~/.bashrc"
 
 # Figure out what kind of machine we're running on,
 # since some customizations are different on mac vs linux
@@ -13,12 +19,15 @@ linux=false
 unknown=false
 
 if [ $platform = 'Darwin' ]; then
+    cprint "uname==>$platform so we must be running on a mac"
     platform='osx'
     mac=true
 elif [ $platform = 'Linux' ]; then
+    cprint "uname==>$platform so we must be running on a linux machine"
     platform='linux'
     linux=true
 else
+    cprint "uname==>$platform so we don't know what state we're in!"
     platform='unknown'
     unknown=true
 fi
@@ -112,9 +121,6 @@ export CLICOLOR=1
 export LSCOLORS=ExFxBxDxCxegedabagacad
 export PATH="/usr/local/sbin:$PATH"
 
-# Local variables (used in this script only)
-platform="unknown"
-
 # Aliases
 alias glga="git log --graph --abbrev-commit --date=short --pretty=format:\
 '%C(yellow)%h%Creset %C(bold blue)(%an)%Creset%C(yellow)%d%Creset %s %Cgreen<%cr, %ar>%Creset'"
@@ -141,6 +147,9 @@ if [ $linux = true ]; then
 
     # Ignore disabled test suites if we're using testify.  Ain't nobody got time for dat!
     alias testify='testify -x disabled'
+
+    # The linux boxes i typically use already has a PS1 setup.  However, i prefer the additional newline
+    export PS1="$PS1\n$ "
 fi
 
 # Check if brew is installed
@@ -151,14 +160,20 @@ if [ $? = 0 ]; then
 
     brew_path=$(brew --prefix)
     git_prompt=$brew_path/etc/bash_completion.d/git-prompt.sh
-    if [ -a $git_prompt ]; then
+    if [ ! -f $git_prompt ]; then
+        cprint "Couldn't find bash-git-prompt script at $git_prompt --> Installing it now..."
+        brew install bash-git-prompt
+    else
+        cprint "Found bash-git-prompt script at $git_prompt --> Sourcing it now..."
         . $git_prompt
     fi
 
-    # TODO: Add an 'else' here that does the brew install of those nice things that you like
-
     bash_completion=$brew_path/etc/bash_completion
-    if [ -a $bash_completion ]; then
+    if [ ! -f $bash_completion ]; then
+        cprint "Couldn't find bash_completion script --> Installing it now..."
+        brew install bash-completion
+    else
+        cprint "Found bash-completion script at $bash_completion --> Sourcing it now..."
       . $bash_completion
     fi
 
