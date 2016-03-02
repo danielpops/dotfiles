@@ -116,7 +116,7 @@ if [ $linux = true ]; then
     alias testify='testify -x disabled'
 
     # The linux boxes i typically use already has a PS1 setup.  However, i prefer the additional newline
-    export PS1="\[$BPurple\]\u@\[$BGreen\]\h:\[$BYellow\]\w\[$BCyan\]\$(__git_ps1)\r\n\[$Color_Off\]\\$ "
+    export PS1="\[$BBlue\]\u@\[$BGreen\]\h:\[$BYellow\]\w\[$BCyan\]\$(__git_ps1)\r\n\[$Color_Off\]\\$ "
 fi
 
 # Check if brew is installed
