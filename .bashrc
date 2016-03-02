@@ -138,7 +138,7 @@ if [ $mac = true ]; then
 
     # Shell Customizations should basically only need to happen on the mac.
     # The linux boxes i typically use already have them set up
-    export PS1="\[$BPurple\]\u@\[$BGreen\]\h:\[$BYellow\]\w\[$BCyan\]\$(__git_ps1)\r\n\[$Color_Off\]\\$ "
+    export PS1="\[$BBlue\]\u@\[$BGreen\]\h:\[$BYellow\]\w\[$BCyan\]\$(__git_ps1)\r\n\[$Color_Off\]\\$ "
 fi
 
 if [ $linux = true ]; then
