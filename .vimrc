@@ -74,5 +74,6 @@ set autoread
 " Show the file percentage progress
 set ruler
 
-" Always show filename in bottom 'ruler' row
+" Show the full file path in the bottom status bar
+set statusline+=%f
 set laststatus=2
