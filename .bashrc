@@ -81,38 +81,6 @@ On_Cyan='\e[46m'        # Cyan
 On_White='\e[47m'       # White
 On_LightBlue='\e[49m' # Light Blue
 
-# High Intensity
-IBlack='\e[0;90m'       # Black
-IRed='\e[0;91m'         # Red
-IGreen='\e[0;92m'       # Green
-IYellow='\e[0;93m'      # Yellow
-IBlue='\e[0;94m'        # Blue
-IPurple='\e[0;95m'      # Purple
-ICyan='\e[0;96m'        # Cyan
-IWhite='\e[0;97m'       # White
-ILightBlue='\e[0;99m'   # Light Blue
-
-# Bold High Intensity
-BIBlack='\e[1;90m'      # Black
-BIRed='\e[1;91m'        # Red
-BIGreen='\e[1;92m'      # Green
-BIYellow='\e[1;93m'     # Yellow
-BIBlue='\e[1;94m'       # Blue
-BIPurple='\e[1;95m'     # Purple
-BICyan='\e[1;96m'       # Cyan
-BIWhite='\e[1;97m'      # White
-BILightBlue='\e[1;99m'  # Light Blue
-
-# High Intensity backgrounds
-On_IBlack='\e[0;100m'   # Black
-On_IRed='\e[0;101m'     # Red
-On_IGreen='\e[0;102m'   # Green
-On_IYellow='\e[0;103m'  # Yellow
-On_IBlue='\e[0;104m'    # Blue
-On_IPurple='\e[0;105m'  # Purple
-On_ICyan='\e[0;106m'    # Cyan
-On_LightBlue='\e[0:110m' # Light Blue
-
 FancyX='\342\234\227'
 Checkmark='\342\234\223'
 
@@ -127,7 +95,6 @@ alias glga="git log --graph --abbrev-commit --date=short --pretty=format:\
 alias grep="grep --color=auto"
 alias myprocs="ps aux | grep -v grep | grep -v \"ps aux\" | grep -P \"^$(whoami)\s+\d+\""
 alias ..="cd .."
-#alias __git_ps1="git branch 2>/dev/null | grep '*' | sed 's/* \(.*\)/(\1)/'"
 
 if [ $mac = true ]; then
     # On mac, the ls alias to make the colors look pretty is different than on linux
@@ -176,7 +143,11 @@ if [ $? = 0 ]; then
         cprint "Found bash-completion script at $bash_completion --> Sourcing it now..."
       . $bash_completion
     fi
+fi
 
+# If the environment doesn't already have the __git_ps1 alias set up, then explicitly set it
+if [ ! type __git_ps1 &> /dev/null ]; then
+  alias __git_ps1="git branch 2>/dev/null | grep '*' | sed 's/* \(.*\)/(\1)/'"
 fi
 
 # Try to re-mount the dev35-devc dpopes home directory (may fail if already mounted, but doesn't hurt)
