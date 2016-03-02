@@ -184,3 +184,25 @@ fi
 sshfs -o reconnect dpopes@dev35-devc:/nail/home/dpopes/ ~/dev/dev35-devc 2>/dev/null
 # Keeping the 'unmount' command here for reference:
 # diskutil unmountDisk force /Volumes/DISK_NAME
+
+# Add convenience script for printing out "where you are"
+whereami() {
+  directory="/nail/etc/"
+  counter=1
+  for f in runtimeenv ecosystem superregion region habitat; do
+    echo $f:
+    for (( c=0; c<$counter; c++ )); do
+      printf ">"
+    done
+    ((counter++))
+    head -1 $directory/$f
+    if [ $f != 'habitat' ]; then
+      echo
+    fi
+  done
+  echo hostname:
+  for (( c=0; c<$counter; c++ )); do
+    printf ">"
+  done
+  hostname
+}
