@@ -75,5 +75,16 @@ set autoread
 set ruler
 
 " Show the full file path in the bottom status bar
-set statusline+=%f
 set laststatus=2
+"set statusline=%<%F\ %h%m%r%y%=%-14.(%l,%c%V%)\ %P
+
+set statusline=%<%F\  "tail of the filename
+set statusline+=[%{strlen(&fenc)?&fenc:'none'}] "file encoding
+"set statusline+=%{&ff}] "file format ( just prints '[vim]' not sure what's the point?
+set statusline+=%h      "help file flag
+set statusline+=%m      "modified flag
+set statusline+=%r      "read only flag
+set statusline+=%y      "filetype
+set statusline+=%=      "left/right separator
+set statusline+=(%c,%l)
+set statusline+=\ %P    "percent through file
