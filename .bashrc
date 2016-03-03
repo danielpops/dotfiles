@@ -177,3 +177,5 @@ whereami() {
   done
   hostname
 }
+
+echo -ne "\033]0;${USER}@${HOSTNAME}: ${PWD}\007"
