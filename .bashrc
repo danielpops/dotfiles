@@ -179,6 +179,4 @@ whereami() {
   hostname
 }
 
-#if [[ $TMUX ]]; then
-#  PROMPT_COMMAND='eval `/nail/scripts/tmux-env`; $PROMPT_COMMAND'
-#fi
+echo -ne "\033]0;${USER}@${HOSTNAME}: ${PWD}\007"
