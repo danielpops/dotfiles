@@ -66,6 +66,9 @@ set shortmess=atI
 " Auto-load modifications to opened files
 set autoread
 
+" Make pasting from external sources work better
+set paste
+
 " Pathogen
 "execute pathogen#infect()
 "filetype off
