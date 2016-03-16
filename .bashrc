@@ -4,7 +4,7 @@
 # Otherwise, some automated tasks may fail when they receive the unexpected text
 # e.g. rsync, sshfs type things, etc...
 cprint() {
-    if [ ! -z "$PS1" ]; then
+    if [[ $- == *i* ]]; then
         echo $*
     fi
 }
@@ -162,21 +162,21 @@ whereami() {
   directory="/nail/etc/"
   counter=1
   for f in runtimeenv ecosystem superregion region habitat; do
-    echo $f:
+    cprint $f:
     for (( c=0; c<$counter; c++ )); do
       printf ">"
     done
     ((counter++))
     head -1 $directory/$f
     if [ $f != 'habitat' ]; then
-      echo
+      cprint
     fi
   done
-  echo hostname:
+  cprint hostname:
   for (( c=0; c<$counter; c++ )); do
     printf ">"
   done
   hostname
 }
 
-echo -ne "\033]0;${USER}@${HOSTNAME}: ${PWD}\007"
+cprint -ne "\033]0;${USER}@${HOSTNAME}: ${PWD}\007"
