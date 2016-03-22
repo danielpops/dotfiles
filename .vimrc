@@ -91,3 +91,5 @@ set statusline+=%y      "filetype
 set statusline+=%=      "left/right separator
 set statusline+=(%c,%l)
 set statusline+=\ %P    "percent through file
+
+set mouse=a
