@@ -151,6 +151,21 @@ if [ ! type __git_ps1 &> /dev/null ]; then
   alias __git_ps1="git branch 2>/dev/null | grep '*' | sed 's/* \(.*\)/(\1)/'"
 fi
 
+
+# Try to set up some handy git aliases
+
+# .gitignore
+git config --global --get core.excludesfile >/dev/null
+if [ $? != 0 ]; then
+    git config --global core.excludesfile ~/.gitignore
+fi
+
+# `git my` alias
+git config --global --get alias.my >/dev/null
+if [ $? != 0 ]; then
+    git config --global alias.my "log --author=$(whoami)"
+fi
+
 # Try to re-mount the dev35-devc dpopes home directory (may fail if already mounted, but doesn't hurt)
 # This is too specific to my work dev laptop.  Consider removing it or addressing it some other way
 sshfs -o reconnect dpopes@dev35-devc:/nail/home/dpopes/ ~/dev/dev35-devc 2>/dev/null
