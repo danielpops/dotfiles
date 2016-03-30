@@ -1,6 +1,9 @@
 " Activates Syntax Highlighting
 syntax on
 
+" Filetype on
+filetype on
+
 " Show Line Numbers
 set number
 
