@@ -11,6 +11,9 @@ cprint() {
 
 cprint "Loading ~/.bashrc"
 
+# Set vi emulation mode in bash prompts
+set -o vi
+
 # Figure out what kind of machine we're running on,
 # since some customizations are different on mac vs linux
 platform=$(uname)

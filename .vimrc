@@ -1,6 +1,12 @@
 " Activates Syntax Highlighting
 syntax on
 
+" Filetype on
+filetype on
+
+" Prevent visual mode highlighting from hiding white text
+set background=dark
+
 " Show Line Numbers
 set number
 
