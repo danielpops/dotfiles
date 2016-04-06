@@ -99,3 +99,12 @@ set statusline+=(%c,%l)
 set statusline+=\ %P    "percent through file
 
 set mouse=a
+
+" Make pane moving and switching more like tmux
+nnoremap <C-P> <C-W>
+" Vertical pane resizing
+nnoremap <C-P><C-H> <C-W>10<
+nnoremap <C-P><C-L> <C-W>10>
+" Horizontal pane resizing
+nnoremap <C-P><C-K> <C-W>10+
+nnoremap <C-P><C-J> <C-W>10-
