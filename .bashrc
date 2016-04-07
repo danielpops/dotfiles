@@ -121,6 +121,11 @@ if [ $linux = true ]; then
     # The linux boxes i typically use already has a PS1 setup.  However, i prefer the additional newline
     #export PS1="\[$BBlue\]\u@\[$BGreen\]\h:\[$BYellow\]\w\[$BCyan\]\$(__git_ps1)\r\n\[$Color_Off\]\\$ "
     export PS1="$PS1\n\\$ "
+
+    # enable bash completion in interactive shells
+    if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
+        . /etc/bash_completion
+    fi
 fi
 
 # Check if brew is installed
