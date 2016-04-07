@@ -150,7 +150,8 @@ if [ $? = 0 ]; then
 fi
 
 # If the environment doesn't already have the __git_ps1 alias set up, then explicitly set it
-if [ ! type __git_ps1 &> /dev/null ]; then
+type __git_ps1 &> /dev/null
+if [ $? != 0  ]; then
   alias __git_ps1="git branch 2>/dev/null | grep '*' | sed 's/* \(.*\)/(\1)/'"
 fi
 
