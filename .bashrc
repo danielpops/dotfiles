@@ -12,7 +12,7 @@ cprint() {
 cprint "Loading ~/.bashrc"
 
 # Set vi emulation mode in bash prompts
-set -o vi
+#set -o vi
 
 # Figure out what kind of machine we're running on,
 # since some customizations are different on mac vs linux
@@ -121,6 +121,11 @@ if [ $linux = true ]; then
     # The linux boxes i typically use already has a PS1 setup.  However, i prefer the additional newline
     #export PS1="\[$BBlue\]\u@\[$BGreen\]\h:\[$BYellow\]\w\[$BCyan\]\$(__git_ps1)\r\n\[$Color_Off\]\\$ "
     export PS1="$PS1\n\\$ "
+
+    # enable bash completion in interactive shells
+    if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
+        . /etc/bash_completion
+    fi
 fi
 
 # Check if brew is installed
@@ -150,7 +155,8 @@ if [ $? = 0 ]; then
 fi
 
 # If the environment doesn't already have the __git_ps1 alias set up, then explicitly set it
-if [ ! type __git_ps1 &> /dev/null ]; then
+type __git_ps1 &> /dev/null
+if [ $? != 0  ]; then
   alias __git_ps1="git branch 2>/dev/null | grep '*' | sed 's/* \(.*\)/(\1)/'"
 fi
 
