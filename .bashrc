@@ -91,6 +91,7 @@ Checkmark='\342\234\223'
 export CLICOLOR=1
 export LSCOLORS=ExFxBxDxCxegedabagacad
 export PATH="/usr/local/sbin:$PATH"
+export PAGER=less
 
 # Aliases
 alias glga="git log --graph --abbrev-commit --date=short --pretty=format:\
