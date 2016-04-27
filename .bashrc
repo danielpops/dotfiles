@@ -99,6 +99,10 @@ alias grep="grep --color=auto"
 alias myprocs="ps aux | grep -v grep | grep -v \"ps aux\" | grep -P \"^$(whoami)\s+\d+\""
 alias ..="cd .."
 
+# Hack to allow aliases to be honored when using sudo
+# http://askubuntu.com/questions/22037/aliases-not-available-when-using-sudo
+alias sudo="sudo "
+
 if [ $mac = true ]; then
     # On mac, the ls alias to make the colors look pretty is different than on linux
     alias ls="ls -GFh"
