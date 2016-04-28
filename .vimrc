@@ -108,3 +108,6 @@ nnoremap <C-P><C-L> <C-W>10>
 " Horizontal pane resizing
 nnoremap <C-P><C-K> <C-W>10+
 nnoremap <C-P><C-J> <C-W>10-
+
+" Search for the currently highlighted selection
+vnoremap // y/<C-R>"<CR>
