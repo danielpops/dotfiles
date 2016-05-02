@@ -111,3 +111,7 @@ nnoremap <C-P><C-J> <C-W>10-
 
 " Search for the currently highlighted selection
 vnoremap // y/<C-R>"<CR>
+
+" Make j and k work better with word-wrapped lines
+nnoremap j gj
+nnoremap k gk
