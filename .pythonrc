@@ -1,7 +1,24 @@
 try:
+    import atexit
+    import os
     import readline
-except ImportError:
-    print("Module readline not available.")
+except ImportError as e:
+    print("Module not available: " + str(e))
 else:
-    import rlcompleter
+    import readline
+
+    # Add tab-completion
     readline.parse_and_bind("tab: complete")
+
+    # Save history for future python interpreter invocations
+    historyPath = os.path.expanduser("~/.pyhistory")
+
+    def save_history(historyPath=historyPath):
+        readline.write_history_file(historyPath)
+
+    # Read the history from disk
+    if os.path.exists(historyPath):
+        readline.read_history_file(historyPath)
+
+    # Register that save_history is called when the python intepreter exits
+    atexit.register(save_history)
