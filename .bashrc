@@ -11,6 +11,9 @@ cprint() {
 
 cprint "Loading ~/.bashrc"
 
+# Set up auto-completion in python interactive shell
+export PYTHONSTARTUP=~/.pythonrc
+
 # Set vi emulation mode in bash prompts
 #set -o vi
 
