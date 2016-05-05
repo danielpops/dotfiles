@@ -115,3 +115,6 @@ vnoremap // y/<C-R>"<CR>
 " Make j and k work better with word-wrapped lines
 nnoremap j gj
 nnoremap k gk
+
+" Make yanks, deletes, etc... go to the mac system clipboard, if you're in macvim or gvim
+set clipboard=unnamed
