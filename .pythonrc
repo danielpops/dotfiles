@@ -2,6 +2,7 @@ try:
     import atexit
     import os
     import readline
+    import rlcompleter
 except ImportError as e:
     print("Module not available: " + str(e))
 else:
