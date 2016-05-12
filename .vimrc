@@ -118,3 +118,6 @@ nnoremap k gk
 
 " Make yanks, deletes, etc... go to the mac system clipboard, if you're in macvim or gvim
 set clipboard=unnamed
+
+" Make two exclamations save the file using sudo
+cmap w!! w !sudo tee %
