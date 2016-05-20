@@ -109,6 +109,12 @@ nnoremap <C-P><C-L> <C-W>10>
 nnoremap <C-P><C-K> <C-W>10+
 nnoremap <C-P><C-J> <C-W>10-
 
+"split navigations
+nnoremap <C-J> <C-W><C-J>
+nnoremap <C-K> <C-W><C-K>
+nnoremap <C-L> <C-W><C-L>
+nnoremap <C-H> <C-W><C-H>
+
 " Search for the currently highlighted selection
 vnoremap // y/<C-R>"<CR>
 
@@ -123,12 +129,12 @@ set clipboard=unnamed
 cmap w!! w !sudo tee %
 
 
-" Syntastic stuff... revisit later!
-set statusline+=%#warningmsg#
-set statusline+=%{SyntasticStatuslineFlag()}
-set statusline+=%*
-
-let g:syntastic_always_populate_loc_list = 1
-let g:syntastic_auto_loc_list = 1
-let g:syntastic_check_on_open = 1
-let g:syntastic_check_on_wq = 0
+" Syntastic stuff... was causing too many false positive syntax failures... revisit later!
+"set statusline+=%#warningmsg#
+"set statusline+=%{SyntasticStatuslineFlag()}
+"set statusline+=%*
+"
+"let g:syntastic_always_populate_loc_list = 1
+"let g:syntastic_auto_loc_list = 1
+"let g:syntastic_check_on_open = 1
+"let g:syntastic_check_on_wq = 0

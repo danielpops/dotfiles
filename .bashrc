@@ -194,12 +194,13 @@ if [ ! -f $pathogen_file ]; then
     curl -LSso $pathogen_file https://tpo.pe/pathogen.vim
 fi
 
-syntastic_folder=~/.vim/bundle/syntastic
-if [ ! -d $syntastic_folder ]; then
-    cprint "Systastic not found.  Installing it now..."
-    mkdir -p $syntastic_folder
-    git clone https://github.com/scrooloose/syntastic.git $syntastic_folder
-fi
+# Systastic caused too many problems... revisit later!
+#syntastic_folder=~/.vim/bundle/syntastic
+#if [ ! -d $syntastic_folder ]; then
+#    cprint "Systastic not found.  Installing it now..."
+#    mkdir -p $syntastic_folder
+#    git clone https://github.com/scrooloose/syntastic.git $syntastic_folder
+#fi
 
 # Try to re-mount the dev35-devc dpopes home directory (may fail if already mounted, but doesn't hurt)
 # This is too specific to my work dev laptop.  Consider removing it or addressing it some other way
