@@ -102,6 +102,7 @@ alias glga="git log --graph --abbrev-commit --date=short --pretty=format:\
 alias grep="grep --color=auto"
 alias myprocs="ps aux | grep -v grep | grep -v \"ps aux\" | grep -P \"^$(whoami)\s+\d+\""
 alias ..="cd .."
+alias pbcopy="ssh -A 10.255.55.243 pbcopy"
 
 # Hack to allow aliases to be honored when using sudo
 # http://askubuntu.com/questions/22037/aliases-not-available-when-using-sudo
