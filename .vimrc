@@ -76,7 +76,7 @@ set autoread
 set paste
 
 " Pathogen
-"execute pathogen#infect()
+execute pathogen#infect()
 "filetype off
 "filetype plugin indent on
 
@@ -121,3 +121,14 @@ set clipboard=unnamed
 
 " Make two exclamations save the file using sudo
 cmap w!! w !sudo tee %
+
+
+" Syntastic stuff... revisit later!
+set statusline+=%#warningmsg#
+set statusline+=%{SyntasticStatuslineFlag()}
+set statusline+=%*
+
+let g:syntastic_always_populate_loc_list = 1
+let g:syntastic_auto_loc_list = 1
+let g:syntastic_check_on_open = 1
+let g:syntastic_check_on_wq = 0
