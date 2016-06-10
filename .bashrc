@@ -169,6 +169,13 @@ if [ $? != 0  ]; then
   alias __git_ps1="git branch 2>/dev/null | grep '*' | sed 's/* \(.*\)/(\1)/'"
 fi
 
+# Set up aactivator for virtualenvs
+if [ -f ~/.dotfiles/aactivator.py ]; then
+  if [ -z "$AACTIVATOR_VERSION" ]; then
+    cprint "Sourcing aactivator init..."
+    eval "$(~/.dotfiles/aactivator.py init)"
+  fi
+fi
 
 # Try to set up some handy git aliases
 
