@@ -144,3 +144,6 @@ cmap w!! w !sudo tee %
 ":set shellcmdflag=-lic
 
 let $BASH_ENV = "~/.bash_aliases"
+
+" Associate *.disabled with yaml filetype
+au BufRead,BufNewFile *.disabled setfiletype yaml
