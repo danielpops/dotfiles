@@ -26,11 +26,11 @@ linux=false
 unknown=false
 
 if [ $platform = 'Darwin' ]; then
-    cprint "uname==>$platform so we must be running on a mac"
+    #cprint "uname==>$platform so we must be running on a mac"
     platform='osx'
     mac=true
 elif [ $platform = 'Linux' ]; then
-    cprint "uname==>$platform so we must be running on a linux machine"
+    #cprint "uname==>$platform so we must be running on a linux machine"
     platform='linux'
     linux=true
 else
