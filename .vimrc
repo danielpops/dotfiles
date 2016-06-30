@@ -139,4 +139,8 @@ cmap w!! w !sudo tee %
 "let g:syntastic_check_on_open = 1
 "let g:syntastic_check_on_wq = 0
 
-:set shellcmdflag=-lic
+" Comment out shellcmdflag for now. Sourcing the bash aliases
+" alone via $BASH_ENV appears to be a better solution
+":set shellcmdflag=-lic
+
+let $BASH_ENV = "~/.bash_aliases"

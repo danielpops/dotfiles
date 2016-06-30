@@ -9,6 +9,7 @@ cprint() {
     fi
 }
 
+color_prompt=yes
 cprint "Loading ~/.bashrc"
 
 # Set up auto-completion in python interactive shell
@@ -97,39 +98,27 @@ export PATH="/usr/local/sbin:$PATH"
 export PAGER=less
 
 # Aliases
-alias glga="git log --graph --abbrev-commit --date=short --pretty=format:\
-'%C(yellow)%h%Creset %C(bold blue)(%an)%Creset%C(yellow)%d%Creset %s %Cgreen<%cr, %ar>%Creset'"
-alias grep="grep --color=auto"
-alias myprocs="ps aux | grep -v grep | grep -v \"ps aux\" | grep -P \"^$(whoami)\s+\d+\""
-alias ..="cd .."
-alias pbcopy="ssh -A 10.255.55.243 pbcopy"
+# You may want to put all your additions into a separate file like
+# ~/.bash_aliases, instead of adding them here directly.
 
-# Hack to allow aliases to be honored when using sudo
-# http://askubuntu.com/questions/22037/aliases-not-available-when-using-sudo
-alias sudo="sudo "
+if [ -f ~/.bash_aliases ]; then
+    . ~/.bash_aliases
+fi
 
 if [ $mac = true ]; then
-    # On mac, the ls alias to make the colors look pretty is different than on linux
-    alias ls="ls -GFh"
-
-    # On mac, this is where the Adium irc logs go.  It's an annoying path to remember otherwise.
-    alias irclogs="cd ~/Library/Application\ Support/Adium\ 2.0/Users/Default/Logs/IRC.$USER"
-
     # Shell Customizations should basically only need to happen on the mac.
     # The linux boxes i typically use already have them set up
     export PS1="\[$BBlue\]\u@\[$BGreen\]\h:\[$BYellow\]\w\[$BCyan\]\$(__git_ps1)\r\n\[$Color_Off\]\\$ "
 fi
 
 if [ $linux = true ]; then
-    # On linux, the ls alias to make the colors look pretty is different than on mac
-    alias ls='ls --color=tty -Fh'
-
-    # Ignore disabled test suites if we're using testify.  Ain't nobody got time for dat!
-    alias testify='testify -x disabled'
-
     # The linux boxes i typically use already has a PS1 setup.  However, i prefer the additional newline
-    #export PS1="\[$BBlue\]\u@\[$BGreen\]\h:\[$BYellow\]\w\[$BCyan\]\$(__git_ps1)\r\n\[$Color_Off\]\\$ "
-    export PS1="$PS1\n\\$ "
+    if grep -q git_ps1 <<<$PS1
+    then
+        export PS1="$PS1\n\\$ "
+    else
+        export PS1="\[$BBlue\]\u@\[$BGreen\]\h:\[$BYellow\]\w\[$BCyan\]\$(__git_ps1)\r\n\[$Color_Off\]\\$ "
+    fi
 
     # enable bash completion in interactive shells
     if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
