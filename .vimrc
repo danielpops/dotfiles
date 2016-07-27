@@ -72,13 +72,13 @@ set shortmess=atI
 " Auto-load modifications to opened files
 set autoread
 
-" Make pasting from external sources work better
-set paste
-
 " Pathogen
-execute pathogen#infect()
+"execute pathogen#infect()
 "filetype off
 "filetype plugin indent on
+call pathogen#infect()
+syntax on
+filetype plugin indent on
 
 " Show the file percentage progress
 set ruler
@@ -146,4 +146,7 @@ cmap w!! w !sudo tee %
 let $BASH_ENV = "~/.bash_aliases"
 
 " Associate *.disabled with yaml filetype
-au BufRead,BufNewFile *.disabled setfiletype yaml
+autocmd BufRead,BufNewFile *.disabled setfiletype yaml
+
+" Associate *.pp with json filetype
+autocmd BufNewFile,BufRead *.pp set ft=javascript
