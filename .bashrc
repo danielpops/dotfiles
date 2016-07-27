@@ -199,6 +199,13 @@ fi
 #    git clone https://github.com/scrooloose/syntastic.git $syntastic_folder
 #fi
 
+puppet_vim_folder=~/.vim/bundle/vim-puppet
+if [ ! -d $puppet_vim_folder ]; then
+    cprint "Puppet-vim not found.  Installing it now..."
+    mkdir -p $puppet_vim_folder
+    git clone https://github.com/rodjek/puppet.git $puppet_vim_folder
+fi
+
 # Try to re-mount the dev35-devc dpopes home directory (may fail if already mounted, but doesn't hurt)
 # This is too specific to my work dev laptop.  Consider removing it or addressing it some other way
 sshfs -o reconnect dpopes@dev35-devc:/nail/home/dpopes/ ~/dev/dev35-devc 2>/dev/null
