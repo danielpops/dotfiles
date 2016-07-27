@@ -137,19 +137,17 @@ if [ $? = 0 ]; then
     if [ ! -f $git_prompt ]; then
         cprint "Couldn't find bash-git-prompt script at $git_prompt --> Installing it now..."
         brew install bash-git-prompt
-    else
-        cprint "Found bash-git-prompt script at $git_prompt --> Sourcing it now..."
-        . $git_prompt
     fi
+    cprint "Loading $git_prompt"
+    . $git_prompt
 
     bash_completion=$brew_path/etc/bash_completion
     if [ ! -f $bash_completion ]; then
         cprint "Couldn't find bash_completion script --> Installing it now..."
         brew install bash-completion
-    else
-        cprint "Found bash-completion script at $bash_completion --> Sourcing it now..."
-      . $bash_completion
     fi
+    cprint "Loading $bash_completion"
+  . $bash_completion
 fi
 
 # If the environment doesn't already have the __git_ps1 alias set up, then explicitly set it
