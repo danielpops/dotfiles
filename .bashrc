@@ -203,7 +203,7 @@ puppet_vim_folder=~/.vim/bundle/vim-puppet
 if [ ! -d $puppet_vim_folder ]; then
     cprint "Puppet-vim not found.  Installing it now..."
     mkdir -p $puppet_vim_folder
-    git clone https://github.com/rodjek/puppet.git $puppet_vim_folder
+    git clone https://github.com/rodjek/vim-puppet.git $puppet_vim_folder
 fi
 
 # Try to re-mount the dev35-devc dpopes home directory (may fail if already mounted, but doesn't hurt)
