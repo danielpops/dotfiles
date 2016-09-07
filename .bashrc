@@ -106,18 +106,15 @@ if [ -f ~/.bash_aliases ]; then
 fi
 
 if [ $mac = true ]; then
-    # Shell Customizations should basically only need to happen on the mac.
-    # The linux boxes i typically use already have them set up
-    export PS1="\[$BBlue\]\u@\[$BGreen\]\h:\[$BYellow\]\w\[$BCyan\]\$(__git_ps1)\r\n\[$Color_Off\]\\$ "
+    export PS1="\[$BBlue\]\u@\[$BGreen\]\h:\[$BYellow\]\w\[$BCyan\]\$(__git_ps1)\[$BGreen\] [\t]\r\n\[$Color_Off\]\\$ "
 fi
 
 if [ $linux = true ]; then
-    # The linux boxes i typically use already has a PS1 setup.  However, i prefer the additional newline
     if grep -q git_ps1 <<<$PS1
     then
-        export PS1="$PS1\n\\$ "
+        export PS1="\[$BBlue\]\u@\[$BGreen\]\h:\[$BYellow\]\w\[$BCyan\]\$(__git_ps1)\[$BGreen\] [\t]\r\n\[$Color_Off\]\\$ "
     else
-        export PS1="\[$BBlue\]\u@\[$BGreen\]\h:\[$BYellow\]\w\[$BCyan\]\$(__git_ps1)\r\n\[$Color_Off\]\\$ "
+        export PS1="\[$BBlue\]\u@\[$BGreen\]\h:\[$BYellow\]\w\[$BCyan\]\$(__git_ps1)\[$BGreen\] [\t]\r\n\[$Color_Off\]\\$ "
     fi
 
     # enable bash completion in interactive shells
@@ -219,7 +216,7 @@ whereami() {
     for (( c=0; c<$counter; c++ )); do
       printf ">"
     done
-    ((counter++))
+    (counter++)
     head -1 $directory/$f
     if [ $f != 'habitat' ]; then
       cprint
