@@ -150,3 +150,13 @@ autocmd BufRead,BufNewFile *.disabled setfiletype yaml
 
 " Associate *.pp with json filetype
 autocmd BufNewFile,BufRead *.pp set ft=javascript
+
+" Don't create .swp files
+set nobackup
+set noswapfile
+
+" Remember more commands and search history
+set history=1000
+
+" Use many levels of undo
+set undolevels=1000
