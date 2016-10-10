@@ -12,7 +12,7 @@ set number
 
 " Show whitespace
 set list
-set listchars=eol:$,tab:>-,trail:~,extends:>,precedes:<
+set listchars=tab:>-,trail:~,extends:>,precedes:<,eol:$
 
 " Allows you to deal with multiple unsaved buffers
 " simultaneously without resoring to misusing tabs
