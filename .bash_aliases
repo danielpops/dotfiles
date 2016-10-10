@@ -16,6 +16,7 @@ alias git-root='pushd . && cd $(git rev-parse --show-cdup)'
 alias grep="grep --color=auto"
 alias myprocs="ps aux | grep -v grep | grep -v \"ps aux\" | grep -P \"^$(whoami)\s+\d+\""
 alias ..="cd .."
+alias :q="echo 'This is not git, dummy!'"
 
 # Hack to allow aliases to be honored when using sudo
 # http://askubuntu.com/questions/22037/aliases-not-available-when-using-sudo
