@@ -108,6 +108,9 @@ fi
 
 if [ $mac = true ]; then
     export PS1="\[$BBlue\]\u@\[$BGreen\]\h:\[$BYellow\]\w\[$BCyan\]\$(__git_ps1)\[$BGreen\] [\t]\r\n\[$Color_Off\]\\$ "
+
+    # On mac, change the default wifi login screen application so that it opens in the regular browser
+    defaults write /Library/Preferences/SystemConfiguration/com.apple.captive.control Active -boolean false
 fi
 
 if [ $linux = true ]; then
