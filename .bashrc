@@ -96,6 +96,7 @@ export CLICOLOR=1
 export LSCOLORS=ExFxBxDxCxegedabagacad
 export PATH="/usr/local/sbin:$PATH"
 export PAGER=less
+export PROMPT_COMMAND='history -a'
 
 # Aliases
 # You may want to put all your additions into a separate file like
