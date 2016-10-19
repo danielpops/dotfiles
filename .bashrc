@@ -205,6 +205,15 @@ if [ ! -d $puppet_vim_folder ]; then
     git clone https://github.com/rodjek/vim-puppet.git $puppet_vim_folder
 fi
 
+# If the azure completion file exists, load it
+if [ ! -f ~/.azure.completion.sh ]; then
+    azure --completion > ~/.azure.completion.sh
+    if [ $? = 0 ]; then
+        source ~/.azure.completion.sh
+    fi
+    rm -rf ~/.azure.completion.sh
+fi
+
 # Try to re-mount the dev35-devc dpopes home directory (may fail if already mounted, but doesn't hurt)
 # This is too specific to my work dev laptop.  Consider removing it or addressing it some other way
 sshfs -o reconnect dpopes@dev35-devc:/nail/home/dpopes/ ~/dev/dev35-devc 2>/dev/null
