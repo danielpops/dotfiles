@@ -17,8 +17,14 @@ alias grep="grep --color=auto"
 alias myprocs="ps aux | grep -v grep | grep -v \"ps aux\" | grep -P \"^$(whoami)\s+\d+\""
 alias ..="cd .."
 alias :q="echo 'This is not git, dummy!'"
-alias tmux="tmux2"
-alias agenttmux="agenttmux2"
+
+
+# Check if brew is installed
+which tmux2 > /dev/null
+if [ $? = 0 ]; then
+    alias tmux="tmux2"
+    alias agenttmux="agenttmux2"
+fi
 
 # Hack to allow aliases to be honored when using sudo
 # http://askubuntu.com/questions/22037/aliases-not-available-when-using-sudo
