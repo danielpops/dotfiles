@@ -189,3 +189,9 @@ nmap <silent> <leader>w :set nolist!<CR>
 "nnoremap : q:a
 "nnoremap / q/a
 "nnoremap ? q?a
+
+" Keep undo history across sessions, by storing in file.
+" Only works all the time.
+silent !mkdir ~/.vim/backups > /dev/null 2>&1
+set undodir=~/.vim/backups
+set undofile
