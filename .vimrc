@@ -1,3 +1,9 @@
+" Use Vim settings and not vi settings
+set nocompatible
+
+" Change <Leader>
+let mapleader = ","
+
 " Activates Syntax Highlighting
 syntax on
 
@@ -12,7 +18,7 @@ set number
 
 " Show whitespace
 set list
-set listchars=tab:>-,trail:~,extends:>,precedes:<,eol:$
+set listchars=tab:>-,trail:·,extends:>,precedes:<,eol:$
 
 " Allows you to deal with multiple unsaved buffers
 " simultaneously without resoring to misusing tabs
@@ -46,9 +52,9 @@ set splitbelow
 set hlsearch
 
 " Make common commands case-insensitive
-:command Wq wq
-:command W w
-:command Q q
+:command! Wq wq
+:command! W w
+:command! Q q
 nnoremap <CR> :nohlsearch<CR><CR>
 nnoremap <silent> <Space> :nohlsearch<Bar>:echo<CR>
 
@@ -78,7 +84,9 @@ set autoread
 "filetype plugin indent on
 call pathogen#infect()
 syntax on
-filetype plugin indent on
+filetype on
+filetype plugin on
+filetype indent on
 
 " Show the file percentage progress
 set ruler
@@ -160,3 +168,24 @@ set history=1000
 
 " Use many levels of undo
 set undolevels=1000
+
+" Disable bell
+set visualbell
+set noerrorbells
+
+" Enable extended % matching
+" % matches on if/else, html tags, etc.
+runtime macros/matchit.vim
+
+" Bash-like filename completion
+set wildmenu
+set wildmode=list:longest
+set wildignore=*.o,*.pyc
+
+" Make it easy to toggle between showing whitespace, eol, etc...
+nmap <silent> <leader>w :set nolist!<CR>
+
+" Vi-style editing in the command-line (kind of annoying)
+"nnoremap : q:a
+"nnoremap / q/a
+"nnoremap ? q?a
