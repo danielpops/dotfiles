@@ -205,6 +205,13 @@ if [ ! -d $puppet_vim_folder ]; then
     git clone https://github.com/rodjek/vim-puppet.git $puppet_vim_folder
 fi
 
+docker_vim_folder=~/.vim/bundle/Dockerfile
+if [ ! -d $docker_vim_folder ]; then
+    cprint "Dockerfile.vim not found.  Installing it now..."
+    mkdir -p $docker_vim_folder
+    git clone https://github.com/ekalinin/Dockerfile.vim.git $docker_vim_folder
+fi
+
 # If the azure completion file exists, load it
 if [ ! -f ~/.azure.completion.sh ]; then
     which azure > /dev/null
