@@ -191,7 +191,7 @@ fi
 
 pathogen_file=~/.vim/autoload/pathogen.vim
 if [ ! -f $pathogen_file ]; then
-    cprint "Pathogen not found.  Installing it now..."
+    cprint "Pathogen not found. Installing it now..."
     mkdir -p ~/.vim/autoload ~/.vim/bundle && \
     curl -LSso $pathogen_file https://tpo.pe/pathogen.vim
 fi
@@ -199,21 +199,21 @@ fi
 # Systastic caused too many problems... revisit later!
 #syntastic_folder=~/.vim/bundle/syntastic
 #if [ ! -d $syntastic_folder ]; then
-#    cprint "Systastic not found.  Installing it now..."
+#    cprint "Systastic not found. Installing it now..."
 #    mkdir -p $syntastic_folder
 #    git clone https://github.com/scrooloose/syntastic.git $syntastic_folder
 #fi
 
 puppet_vim_folder=~/.vim/bundle/vim-puppet
 if [ ! -d $puppet_vim_folder ]; then
-    cprint "Puppet-vim not found.  Installing it now..."
+    cprint "Puppet-vim not found. Installing it now..."
     mkdir -p $puppet_vim_folder
     git clone https://github.com/rodjek/vim-puppet.git $puppet_vim_folder
 fi
 
 docker_vim_folder=~/.vim/bundle/Dockerfile
 if [ ! -d $docker_vim_folder ]; then
-    cprint "Dockerfile.vim not found.  Installing it now..."
+    cprint "Dockerfile.vim not found. Installing it now..."
     mkdir -p $docker_vim_folder
     git clone https://github.com/ekalinin/Dockerfile.vim.git $docker_vim_folder
 fi
@@ -231,7 +231,7 @@ if [ ! -f ~/.azure.completion.sh ]; then
 fi
 
 # Try to re-mount the dev35-devc dpopes home directory (may fail if already mounted, but doesn't hurt)
-# This is too specific to my work dev laptop.  Consider removing it or addressing it some other way
+# This is too specific to my work dev laptop. Consider removing it or addressing it some other way
 sshfs -o reconnect dpopes@dev35-devc:/nail/home/dpopes/ ~/dev/dev35-devc 2>/dev/null
 # Keeping the 'unmount' command here for reference:
 # diskutil unmountDisk force /Volumes/DISK_NAME
