@@ -110,7 +110,13 @@ if [ $mac = true ]; then
     export PS1="\[$BBlue\]\u@\[$BGreen\]\h:\[$BYellow\]\w\[$BCyan\]\$(__git_ps1)\[$BGreen\] [\t]\r\n\[$Color_Off\]\\$ "
 
     # On mac, change the default wifi login screen application so that it opens in the regular browser
-    defaults write /Library/Preferences/SystemConfiguration/com.apple.captive.control Active -boolean false
+    # This will eval "Active=0;" or "Active=1" depending on whether or not this is already disabled
+    eval $(defaults read /Library/Preferences/SystemConfiguration/com.apple.captive.control | grep ^[^{}] | sed 's/ //g')
+
+    if [ $Active = '1' ]; then
+        cprint "Disabling com.apple.captive.control so that the default wifi login screen app is a regular browser..."
+        sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.captive.control Active -boolean false
+    fi
 fi
 
 if [ $linux = true ]; then
