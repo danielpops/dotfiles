@@ -230,6 +230,14 @@ if [ ! -f ~/.azure.completion.sh ]; then
     fi
 fi
 
+# Tmux Plugin Manager
+tpm_folder=~/.tmux/plugins/tpm
+if [ ! -d $tpm_folder ]; then
+    cprint "Tmux Plugin Manager not found. Installing it now..."
+    mkdir -p $tpm_folder
+    git clone https://github.com/tmux-plugins/tpm $tpm_folder
+fi
+
 # Try to re-mount the dev35-devc dpopes home directory (may fail if already mounted, but doesn't hurt)
 # This is too specific to my work dev laptop. Consider removing it or addressing it some other way
 sshfs -o reconnect dpopes@dev35-devc:/nail/home/dpopes/ ~/dev/dev35-devc 2>/dev/null
