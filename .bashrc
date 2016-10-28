@@ -207,11 +207,14 @@ fi
 
 # If the azure completion file exists, load it
 if [ ! -f ~/.azure.completion.sh ]; then
-    azure --completion > ~/.azure.completion.sh
+    which azure > /dev/null
     if [ $? = 0 ]; then
-        source ~/.azure.completion.sh
+        azure --completion > ~/.azure.completion.sh
+        if [ $? = 0 ]; then
+            source ~/.azure.completion.sh
+        fi
+        rm -rf ~/.azure.completion.sh
     fi
-    rm -rf ~/.azure.completion.sh
 fi
 
 # Try to re-mount the dev35-devc dpopes home directory (may fail if already mounted, but doesn't hurt)
