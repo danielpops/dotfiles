@@ -16,6 +16,10 @@ set background=dark
 " Show Line Numbers
 set number
 
+" Make the dots that I like to use for trailing whitespace (just below) work correctly
+scriptencoding utf-8
+set encoding=utf-8
+
 " Show whitespace
 set list
 set listchars=tab:>-,trail:·,extends:>,precedes:<,eol:$
