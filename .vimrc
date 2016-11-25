@@ -199,3 +199,5 @@ nmap <silent> <leader>w :set nolist!<CR>
 silent !mkdir ~/.vim/backups > /dev/null 2>&1
 set undodir=~/.vim/backups
 set undofile
+
+set guifont=Menlo\ Regular:h18
