@@ -12,7 +12,7 @@ shopt -s expand_aliases
 
 alias glga="git log --graph --abbrev-commit --date=short --pretty=format:\
 '%C(yellow)%h%Creset %C(bold blue)(%an)%Creset%C(yellow)%d%Creset %s %Cgreen<%cr, %ar>%Creset'"
-alias git-root='pushd . && cd $(git rev-parse --show-cdup)'
+alias git-root='pushd . > /dev/null && cd $(git rev-parse --show-cdup)'
 alias grep="grep --color=auto"
 alias myprocs="ps aux | grep -v grep | grep -v \"ps aux\" | grep -P \"^$(whoami)\s+\d+\""
 alias ..="cd .."
