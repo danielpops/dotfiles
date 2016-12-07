@@ -65,6 +65,9 @@ nnoremap <silent> <Space> :nohlsearch<Bar>:echo<CR>
 " Highlight Current Line
 set cursorline
 
+" Highlight Current Column
+set cursorcolumn
+
 " Highlight dynamically as pattern is typed
 set incsearch
 
