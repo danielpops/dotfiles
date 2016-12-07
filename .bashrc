@@ -16,7 +16,7 @@ cprint "Loading ~/.bashrc"
 export PYTHONSTARTUP=~/.pythonrc
 
 # Set vi emulation mode in bash prompts
-#set -o vi
+set -o vi
 
 # Figure out what kind of machine we're running on,
 # since some customizations are different on mac vs linux
