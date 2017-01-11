@@ -267,3 +267,7 @@ whereami() {
 }
 
 cprint -ne "\033]0;${USER}@${HOSTNAME}: ${PWD}\007"
+
+__expand_tilde_by_ref() {
+  printf ''
+}
