@@ -170,6 +170,12 @@ autocmd BufNewFile,BufRead *.pp set ft=javascript
 " needed, and have indentation at 8 chars to be sure that all indents are tabs
 autocmd FileType make set noexpandtab shiftwidth=8 softtabstop=0
 
+" Add completion for xHTML
+autocmd FileType xhtml,html set omnifunc=htmlcomplete#CompleteTags
+
+" Add completion for XML
+autocmd FileType xml set omnifunc=xmlcomplete#CompleteTags
+
 " Don't create .swp files
 set nobackup
 set noswapfile
