@@ -193,7 +193,7 @@ pathogen_file=~/.vim/autoload/pathogen.vim
 if [ ! -f $pathogen_file ]; then
     cprint "Pathogen not found. Installing it now..."
     mkdir -p ~/.vim/autoload ~/.vim/bundle && \
-    curl -LSso $pathogen_file https://tpo.pe/pathogen.vim
+    curl -LSso $pathogen_file https://raw.githubusercontent.com/tpope/vim-pathogen/master/autoload/pathogen.vim
 fi
 
 # Systastic caused too many problems... revisit later!
