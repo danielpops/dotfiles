@@ -218,6 +218,13 @@ if [ ! -d $docker_vim_folder ]; then
     git clone https://github.com/ekalinin/Dockerfile.vim.git $docker_vim_folder
 fi
 
+jedi_vim_folder=~/.vim/bundle/jedi-vim
+if [ ! -d $jedi_vim_folder ]; then
+    cprint "jedi-vim not found. Installing it now..."
+    mkdir -p $jedi_vim_folder
+    git clone --recursive https://github.com/davidhalter/jedi-vim.git $jedi_vim_folder
+fi
+
 # If the azure completion file exists, load it
 if [ ! -f ~/.azure.completion.sh ]; then
     which azure > /dev/null
