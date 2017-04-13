@@ -201,14 +201,14 @@ fi
 #if [ ! -d $syntastic_folder ]; then
 #    cprint "Systastic not found. Installing it now..."
 #    mkdir -p $syntastic_folder
-#    git clone https://github.com/scrooloose/syntastic.git $syntastic_folder
+#    git clone https://github.com/scrooloose/syntastic.git $syntastic_folder > /dev/null 2>&1
 #fi
 
 puppet_vim_folder=~/.vim/bundle/vim-puppet
 if [ ! -d $puppet_vim_folder ]; then
     cprint "Puppet-vim not found. Installing it now..."
     mkdir -p $puppet_vim_folder
-    git clone https://github.com/rodjek/vim-puppet.git $puppet_vim_folder
+    git clone https://github.com/rodjek/vim-puppet.git $puppet_vim_folder > /dev/null 2>&1
 else
     git -C $puppet_vim_folder pull | grep -v "Already up-to-date"
 fi
@@ -217,7 +217,7 @@ docker_vim_folder=~/.vim/bundle/Dockerfile
 if [ ! -d $docker_vim_folder ]; then
     cprint "Dockerfile.vim not found. Installing it now..."
     mkdir -p $docker_vim_folder
-    git clone https://github.com/ekalinin/Dockerfile.vim.git $docker_vim_folder
+    git clone https://github.com/ekalinin/Dockerfile.vim.git $docker_vim_folder > /dev/null 2>&1
 else
     git -C $docker_vim_folder pull | grep -v "Already up-to-date"
 fi
@@ -226,7 +226,7 @@ jedi_vim_folder=~/.vim/bundle/jedi-vim
 if [ ! -d $jedi_vim_folder ]; then
     cprint "jedi-vim not found. Installing it now..."
     mkdir -p $jedi_vim_folder
-    git clone --recursive https://github.com/davidhalter/jedi-vim.git $jedi_vim_folder
+    git clone --recursive https://github.com/davidhalter/jedi-vim.git $jedi_vim_folder > /dev/null 2>&1
 else
     git -C $jedi_vim_folder pull | grep -v "Already up-to-date"
 fi
@@ -248,7 +248,7 @@ tpm_folder=~/.tmux/plugins/tpm
 if [ ! -d $tpm_folder ]; then
     cprint "Tmux Plugin Manager not found. Installing it now..."
     mkdir -p $tpm_folder
-    git clone https://github.com/tmux-plugins/tpm $tpm_folder
+    git clone https://github.com/tmux-plugins/tpm $tpm_folder > /dev/null 2>&1
 else
     git -C $tpm_folder pull | grep -v "Already up-to-date"
 fi
