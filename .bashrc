@@ -210,7 +210,7 @@ if [ ! -d $puppet_vim_folder ]; then
     mkdir -p $puppet_vim_folder
     git clone https://github.com/rodjek/vim-puppet.git $puppet_vim_folder > /dev/null 2>&1
 else
-    git -C $puppet_vim_folder pull | grep -v "Already up-to-date"
+    git -C $puppet_vim_folder pull > /dev/null 2>&1
 fi
 
 docker_vim_folder=~/.vim/bundle/Dockerfile
@@ -219,7 +219,7 @@ if [ ! -d $docker_vim_folder ]; then
     mkdir -p $docker_vim_folder
     git clone https://github.com/ekalinin/Dockerfile.vim.git $docker_vim_folder > /dev/null 2>&1
 else
-    git -C $docker_vim_folder pull | grep -v "Already up-to-date"
+    git -C $docker_vim_folder pull > /dev/null 2>&1
 fi
 
 jedi_vim_folder=~/.vim/bundle/jedi-vim
@@ -228,7 +228,7 @@ if [ ! -d $jedi_vim_folder ]; then
     mkdir -p $jedi_vim_folder
     git clone --recursive https://github.com/davidhalter/jedi-vim.git $jedi_vim_folder > /dev/null 2>&1
 else
-    git -C $jedi_vim_folder pull | grep -v "Already up-to-date"
+    git -C $jedi_vim_folder pull > /dev/null 2>&1
 fi
 
 # If the azure completion file exists, load it
@@ -250,7 +250,7 @@ if [ ! -d $tpm_folder ]; then
     mkdir -p $tpm_folder
     git clone https://github.com/tmux-plugins/tpm $tpm_folder > /dev/null 2>&1
 else
-    git -C $tpm_folder pull | grep -v "Already up-to-date"
+    git -C $tpm_folder pull > /dev/null 2>&1
 fi
 
 # Try to re-mount the dev35-devc dpopes home directory (may fail if already mounted, but doesn't hurt)
