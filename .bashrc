@@ -209,6 +209,8 @@ if [ ! -d $puppet_vim_folder ]; then
     cprint "Puppet-vim not found. Installing it now..."
     mkdir -p $puppet_vim_folder
     git clone https://github.com/rodjek/vim-puppet.git $puppet_vim_folder
+else
+    git -C $puppet_vim_folder pull | grep -v "Already up-to-date"
 fi
 
 docker_vim_folder=~/.vim/bundle/Dockerfile
@@ -216,6 +218,8 @@ if [ ! -d $docker_vim_folder ]; then
     cprint "Dockerfile.vim not found. Installing it now..."
     mkdir -p $docker_vim_folder
     git clone https://github.com/ekalinin/Dockerfile.vim.git $docker_vim_folder
+else
+    git -C $docker_vim_folder pull | grep -v "Already up-to-date"
 fi
 
 jedi_vim_folder=~/.vim/bundle/jedi-vim
@@ -223,6 +227,8 @@ if [ ! -d $jedi_vim_folder ]; then
     cprint "jedi-vim not found. Installing it now..."
     mkdir -p $jedi_vim_folder
     git clone --recursive https://github.com/davidhalter/jedi-vim.git $jedi_vim_folder
+else
+    git -C $jedi_vim_folder pull | grep -v "Already up-to-date"
 fi
 
 # If the azure completion file exists, load it
@@ -243,6 +249,8 @@ if [ ! -d $tpm_folder ]; then
     cprint "Tmux Plugin Manager not found. Installing it now..."
     mkdir -p $tpm_folder
     git clone https://github.com/tmux-plugins/tpm $tpm_folder
+else
+    git -C $tpm_folder pull | grep -v "Already up-to-date"
 fi
 
 # Try to re-mount the dev35-devc dpopes home directory (may fail if already mounted, but doesn't hurt)
