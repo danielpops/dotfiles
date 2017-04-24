@@ -133,7 +133,7 @@ if [ $linux = true ]; then
     fi
 fi
 
-PS1+="\$(RET=\$?; if [[ \$RET != 0 ]]; then echo -n \"\[$BRed\] ✗\"; else echo -n \"\[$BGreen\] ✓\"; fi)\[$Color_Off\]\r\n\\$ "
+PS1+="\$(RET=\$?; if [[ \$RET != 0 ]]; then echo -n \"\[$BRed\] $FancyX \"; else echo -n \"\[$BGreen\] $Checkmark\"; fi)\[$Color_Off\]\r\n\\$ "
 
 # Check if brew is installed
 which brew > /dev/null
