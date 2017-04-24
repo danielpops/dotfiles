@@ -107,7 +107,7 @@ if [ -f ~/.bash_aliases ]; then
 fi
 
 if [ $mac = true ]; then
-    export PS1="\[$BBlue\]\u@\[$BGreen\]\h:\[$BYellow\]\w\[$BCyan\]\$(__git_ps1)\[$BGreen\] [\t]\r\n\[$Color_Off\]\\$ "
+    export PS1="\[$BBlue\]\u@\[$BGreen\]\h:\[$BYellow\]\w\[$BCyan\]\$(__git_ps1)\[$BGreen\] [\t]"
 
     # On mac, change the default wifi login screen application so that it opens in the regular browser
     # This will eval "Active=0;" or "Active=1" depending on whether or not this is already disabled
@@ -122,9 +122,9 @@ fi
 if [ $linux = true ]; then
     if grep -q git_ps1 <<<$PS1
     then
-        export PS1="\[$BBlue\]\u@\[$BGreen\]\h:\[$BYellow\]\w\[$BCyan\]\$(__git_ps1)\[$BGreen\] [\t]\r\n\[$Color_Off\]\\$ "
+        export PS1="\[$BBlue\]\u@\[$BGreen\]\h:\[$BYellow\]\w\[$BCyan\]\$(__git_ps1)\[$BGreen\] [\t]"
     else
-        export PS1="\[$BBlue\]\u@\[$BGreen\]\h:\[$BYellow\]\w\[$BCyan\]\$(__git_ps1)\[$BGreen\] [\t]\r\n\[$Color_Off\]\\$ "
+        export PS1="\[$BBlue\]\u@\[$BGreen\]\h:\[$BYellow\]\w\[$BCyan\]\$(__git_ps1)\[$BGreen\] [\t]"
     fi
 
     # enable bash completion in interactive shells
@@ -132,6 +132,8 @@ if [ $linux = true ]; then
         . /etc/bash_completion
     fi
 fi
+
+PS1+=" \[$Color_Off\]\$(RET=\$?; if [[ \$RET != 0 ]]; then echo -n ✗; else echo -n ✓; fi)\r\n\\$ "
 
 # Check if brew is installed
 which brew > /dev/null
