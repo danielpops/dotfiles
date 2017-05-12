@@ -29,6 +29,9 @@ alias ..="cd .."
 # Make yourself laugh at yourself for being dumb
 alias :q="echo 'This is not git, dummy!'"
 
+# Prevent a typo that occurs far too often
+alias gt=git
+
 
 # Check if brew is installed
 which tmux2 > /dev/null
