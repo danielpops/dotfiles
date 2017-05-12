@@ -10,12 +10,23 @@ cprint() {
 cprint "Loading ~/.bash_aliases"
 shopt -s expand_aliases 
 
+# Give a nice tree structure of the git log
 alias glga="git log --graph --abbrev-commit --date=short --pretty=format:\
 '%C(yellow)%h%Creset %C(bold blue)(%an)%Creset%C(yellow)%d%Creset %s %Cgreen<%cr, %ar>%Creset'"
+
+# Shortcut to get to the root of the repository you're currently in
 alias git-root='pushd . > /dev/null && cd $(git rev-parse --show-cdup)'
+
+# Automatically add match highlighting to grep
 alias grep="grep --color=auto"
+
+# Shortcut to see the procs you're running
 alias myprocs="ps aux | grep -v grep | grep -v \"ps aux\" | grep -P \"^$(whoami)\s+\d+\""
+
+# Shortcut for laziness
 alias ..="cd .."
+
+# Make yourself laugh at yourself for being dumb
 alias :q="echo 'This is not git, dummy!'"
 
 
