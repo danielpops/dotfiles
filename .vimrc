@@ -223,3 +223,6 @@ set undodir=~/.vim/backups
 set undofile
 
 set guifont=Menlo\ Regular:h18
+
+" For the Vim-terraform plugin
+let g:terraform_align=1

@@ -233,6 +233,15 @@ else
     git -C $jedi_vim_folder pull > /dev/null 2>&1
 fi
 
+terraform_vim_folder=~/.vim/bundle/vim-terraform
+if [ ! -d $terraform_vim_folder ]; then
+    cprint "Terraform-vim not found. Installing it now..."
+    mkdir -p $terraform_vim_folder
+    git clone https://github.com/hashivim/vim-terraform.git $terraform_vim_folder > /dev/null 2>&1
+else
+    git -C $terraform_vim_folder pull > /dev/null 2>&1
+fi
+
 # If the azure completion file exists, load it
 if [ ! -f ~/.azure.completion.sh ]; then
     which azure > /dev/null
