@@ -243,6 +243,19 @@ else
     git -C $terraform_vim_folder pull > /dev/null 2>&1
 fi
 
+logstash_vim_folder=~/.vim/logstash.vim
+if [ ! -d $logstash_vim_folder ]; then
+    cprint "logstash.vim not found. Installing it now..."
+    mkdir -p $logstash_vim_folder
+    git clone https://github.com/robbles/logstash.vim $logstash_vim_folder > /dev/null 2>&1
+    mkdir -p ~/.vim/syntax > /dev/null 2>&1
+    mkdir -p ~/.vim/ftdetect > /dev/null 2>&1
+    ln -f -s $logstash_vim_folder/syntax/logstash.vim $logstash_vim_folder/../syntax/logstash.vim
+    ln -f -s $logstash_vim_folder/ftdetect/logstash.vim $logstash_vim_folder/../ftdetect/logstash.vim
+else
+    git -C $logstash_vim_folder pull > /dev/null 2>&1
+fi
+
 # If the azure completion file exists, load it
 if [ ! -f ~/.azure.completion.sh ]; then
     which azure > /dev/null
