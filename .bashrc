@@ -188,6 +188,11 @@ if [ $? != 0 ]; then
     git config --global alias.my "log --author=$(whoami)"
 fi
 
+# use diff3 format for merge conflicts
+git config --global --get merge.conflictstyle >/dev/null
+if [ $? != 0 ]; then
+    git config --global merge.conflictstyle diff3
+fi
 
 # Vim related stuff
 # Set up pathogen and syntastic, if they don't already exist:
