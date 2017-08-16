@@ -27,7 +27,7 @@ alias myprocs="ps aux | grep -v grep | grep -v \"ps aux\" | grep -P \"^$(whoami)
 alias ..="cd .."
 
 # Make yourself laugh at yourself for being dumb
-alias :q="echo 'This is not git, dummy!'"
+alias :q="echo 'This is not vim, dummy!'"
 
 # Prevent a typo that occurs far too often
 alias gt=git
