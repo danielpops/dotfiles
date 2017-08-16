@@ -74,8 +74,5 @@ if [ $linux = true ]; then
 
     # Ignore disabled test suites if we're using testify.  Ain't nobody got time for dat!
     alias testify='testify -x disabled'
-
-    # Trick to interop with MAC clipboard while on work linux environment
-    alias pbcopy="ssh -A 10.255.55.243 pbcopy > /dev/null 2>&1"
 fi
 
