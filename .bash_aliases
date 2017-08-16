@@ -33,7 +33,7 @@ alias :q="echo 'This is not vim, dummy!'"
 alias gt=git
 
 
-# Check if brew is installed
+# Check if we have two separate copies of tmux (1.x and 2.x) and if so, alias tmux to the tmux2 version
 which tmux2 > /dev/null
 if [ $? = 0 ]; then
     alias tmux="tmux2"
