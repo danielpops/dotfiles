@@ -9,6 +9,11 @@ cprint() {
     fi
 }
 
+# Enable XON/XOFF on to make Ctrl+s work to search forward in history
+if [[ $- == *i* ]]; then
+    stty -ixon
+fi
+
 color_prompt=yes
 cprint "Loading ~/.bashrc"
 
