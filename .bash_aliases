@@ -40,6 +40,13 @@ if [ $? = 0 ]; then
     alias agenttmux="agenttmux2"
 fi
 
+# Check for availability of vim8
+which vim8 > /dev/null
+if [ $? = 0 ]; then
+    alias vi="vim"
+    alias vim="vim8"
+fi
+
 # Hack to allow aliases to be honored when using sudo
 # http://askubuntu.com/questions/22037/aliases-not-available-when-using-sudo
 alias sudo="sudo "
