@@ -175,6 +175,12 @@ autocmd BufNewFile,BufRead *.tf set ft=yaml
 " Associate *.conf with json filetype
 autocmd BufNewFile,BufRead *.conf set ft=javascript
 
+" Associate *.groovy with groovy syntax
+autocmd BufNewFile,BufRead *.groovy  setf groovy
+
+" Associate Jenkinsfile with groovy syntax
+autocmd BufNewFile,BufRead Jenkinsfile setf groovy
+
 " In makefiles, don't expand tabs to spaces, since actual tab characters are
 " needed, and have indentation at 8 chars to be sure that all indents are tabs
 autocmd FileType make set noexpandtab shiftwidth=8 softtabstop=0

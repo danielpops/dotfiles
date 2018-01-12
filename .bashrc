@@ -266,6 +266,11 @@ else
     git -C $logstash_vim_folder pull > /dev/null 2>&1
 fi
 
+if [[ ! -f ~/.vim/syntax/groovy.vim ]]; then
+    cprint "groovy.vim not found. Installing it now..."
+    curl -s -o ~/.vim/syntax/groovy.vim http://www.vim.org/scripts/download_script.php?src_id=2926
+fi
+
 # If the azure completion file exists, load it
 if [ ! -f ~/.azure.completion.sh ]; then
     which azure > /dev/null
