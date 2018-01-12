@@ -83,5 +83,8 @@ if [ $linux = true ]; then
 
     # Ignore disabled test suites if we're using testify.  Ain't nobody got time for dat!
     alias testify='testify -x disabled'
+
+    # Shortcut for accessing my remote originating ssh session and getting text on my clipboard
+    alias pbcopy='ssh -A localhost -p 33733 -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no pbcopy 2> /dev/null'
 fi
 
