@@ -32,6 +32,8 @@ alias :q="echo 'This is not vim, dummy!'"
 # Prevent a typo that occurs far too often
 alias gt=git
 
+# Puppet-bundle exec rake spec
+alias pbers="puppet-bundle exec rake spec"
 
 # Check if we have two separate copies of tmux (1.x and 2.x) and if so, alias tmux to the tmux2 version
 which tmux2 > /dev/null
