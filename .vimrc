@@ -232,3 +232,6 @@ set guifont=Menlo\ Regular:h18
 
 " For the Vim-terraform plugin
 let g:terraform_align=1
+
+" Give a shortcut for formatting valid json inside vim
+com! JSON %!python -m json.tool
