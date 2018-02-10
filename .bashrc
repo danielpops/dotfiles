@@ -20,6 +20,9 @@ cprint "Loading ~/.bashrc"
 # Set up auto-completion in python interactive shell
 export PYTHONSTARTUP=~/.pythonrc
 
+# Disable creation of .pyc files
+export PYTHONDONTWRITEBYTECODE=1
+
 # Set vi emulation mode in bash prompts
 set -o vi
 
