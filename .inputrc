@@ -1,1 +1,6 @@
 set editing-mode vi
+"\e[1;5D": backward-word
+"\e[1;5C": forward-word
+
+#"\e????": beginning-of-line
+#"\e????": end-of-line
