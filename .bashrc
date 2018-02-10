@@ -119,9 +119,6 @@ export HISTFILESIZE=100000
 # Configure history in "append" mode
 shopt -s histappend
 
-# Force commands to flush to bash history file after each command
-export PROMPT_COMMAND="history -a;$PROMPT_COMMAND"
-
 # Aliases
 # You may want to put all your additions into a separate file like
 # ~/.bash_aliases, instead of adding them here directly.
