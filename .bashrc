@@ -104,7 +104,23 @@ export CLICOLOR=1
 export LSCOLORS=ExFxBxDxCxegedabagacad
 export PATH="/usr/local/sbin:$PATH"
 export PAGER=less
-export PROMPT_COMMAND='history -a'
+
+# Bash history customizations
+
+# Avoid duplicates
+export HISTCONTROL=ignoredups:erasedups
+
+# big big history (default is 10000)
+export HISTSIZE=100000
+
+# big big history (default is 10000)
+export HISTFILESIZE=100000
+
+# Configure history in "append" mode
+shopt -s histappend
+
+# Force commands to flush to bash history file after each command
+export PROMPT_COMMAND="history -a;$PROMPT_COMMAND"
 
 # Aliases
 # You may want to put all your additions into a separate file like
