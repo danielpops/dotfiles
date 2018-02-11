@@ -13,5 +13,3 @@ cprint "Loading ~/.bash_profile"
 if [ -f ~/.bashrc ]; then
    source ~/.bashrc
 fi
-
-unset PROMPT_COMMAND
