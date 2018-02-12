@@ -296,7 +296,15 @@ fi
 # If the aws completion file exists, load it
 which aws_completer > /dev/null
 if [ $? = 0 ]; then
-    complete -C "$(which aws_completer)" aws
+    AWS_COMPLETER=$(which aws_completer)
+else
+    if [[ -f /opt/venvs/aws-cli/bin/aws_completer ]]; then
+        AWS_COMPLETER=/opt/venvs/aws-cli/bin/aws_completer
+    fi
+fi
+
+if [[ ! -z $AWS_COMPLETER ]]; then
+    complete -C "$AWS_COMPLETER" aws
 fi
 
 # Tmux Plugin Manager
