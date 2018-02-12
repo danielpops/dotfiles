@@ -293,6 +293,12 @@ if [ ! -f ~/.azure.completion.sh ]; then
     fi
 fi
 
+# If the aws completion file exists, load it
+which aws_completer > /dev/null
+if [ $? = 0 ]; then
+    complete -C "$(which aws_completer)" aws
+fi
+
 # Tmux Plugin Manager
 tpm_folder=~/.tmux/plugins/tpm
 if [ ! -d $tpm_folder ]; then
