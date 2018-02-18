@@ -317,11 +317,11 @@ else
     git -C $tpm_folder pull > /dev/null 2>&1
 fi
 
-# Try to re-mount the dev35-devc dpopes home directory (may fail if already mounted, but doesn't hurt)
-# This is too specific to my work dev laptop. Consider removing it or addressing it some other way
-dev_host=dev8-uswest1cdevc
-mkdir -p ~/dev/${dev_host}
-sshfs -o reconnect dpopes@${dev_host}:/nail/home/dpopes/ ~/dev/${dev_host} 2>/dev/null
+## Try to re-mount the dev8 dpopes home directory (may fail if already mounted, but doesn't hurt)
+## This is too specific to my work dev laptop. Consider removing it or addressing it some other way
+#dev_host=dev8-uswest1cdevc
+#mkdir -p ~/dev/${dev_host}
+#sshfs -o reconnect dpopes@${dev_host}:/nail/home/dpopes/ ~/dev/${dev_host} 2>/dev/null
 # Keeping the 'unmount' command here for reference:
 # diskutil unmountDisk force /Volumes/DISK_NAME
 
