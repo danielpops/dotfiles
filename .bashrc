@@ -9,6 +9,24 @@ cprint() {
     fi
 }
 
+# Also only download tools and such if it is an interactive shell (e.g. a real human logging in)
+# Otherwise, some automated tasks may end up taking longer than they should
+# e.g. rsync, sshfs type things, etc...
+ccurl() {
+    if [[ $- == *i* ]]; then
+        curl $*
+    fi
+}
+
+# Also only download tools and such if it is an interactive shell (e.g. a real human logging in)
+# Otherwise, some automated tasks may end up taking longer than they should
+# e.g. rsync, sshfs type things, etc...
+cgit() {
+    if [[ $- == *i* ]]; then
+        git $*
+    fi
+}
+
 # Enable XON/XOFF on to make Ctrl+s work to search forward in history
 if [[ $- == *i* ]]; then
     stty -ixon
@@ -216,7 +234,7 @@ pathogen_file=~/.vim/autoload/pathogen.vim
 if [ ! -f $pathogen_file ]; then
     cprint "Pathogen not found. Installing it now..."
     mkdir -p ~/.vim/autoload ~/.vim/bundle && \
-    curl -LSso $pathogen_file https://raw.githubusercontent.com/tpope/vim-pathogen/master/autoload/pathogen.vim
+    ccurl -LSso $pathogen_file https://raw.githubusercontent.com/tpope/vim-pathogen/master/autoload/pathogen.vim
 fi
 
 # Systastic caused too many problems... revisit later!
@@ -231,54 +249,54 @@ puppet_vim_folder=~/.vim/bundle/vim-puppet
 if [ ! -d $puppet_vim_folder ]; then
     cprint "Puppet-vim not found. Installing it now..."
     mkdir -p $puppet_vim_folder
-    git clone https://github.com/rodjek/vim-puppet.git $puppet_vim_folder > /dev/null 2>&1
+    cgit clone https://github.com/rodjek/vim-puppet.git $puppet_vim_folder > /dev/null 2>&1
 else
-    git -C $puppet_vim_folder pull > /dev/null 2>&1
+    cgit -C $puppet_vim_folder pull > /dev/null 2>&1
 fi
 
 docker_vim_folder=~/.vim/bundle/Dockerfile
 if [ ! -d $docker_vim_folder ]; then
     cprint "Dockerfile.vim not found. Installing it now..."
     mkdir -p $docker_vim_folder
-    git clone https://github.com/ekalinin/Dockerfile.vim.git $docker_vim_folder > /dev/null 2>&1
+    cgit clone https://github.com/ekalinin/Dockerfile.vim.git $docker_vim_folder > /dev/null 2>&1
 else
-    git -C $docker_vim_folder pull > /dev/null 2>&1
+    cgit -C $docker_vim_folder pull > /dev/null 2>&1
 fi
 
 jedi_vim_folder=~/.vim/bundle/jedi-vim
 if [ ! -d $jedi_vim_folder ]; then
     cprint "jedi-vim not found. Installing it now..."
     mkdir -p $jedi_vim_folder
-    git clone --recursive https://github.com/davidhalter/jedi-vim.git $jedi_vim_folder > /dev/null 2>&1
+    cgit clone --recursive https://github.com/davidhalter/jedi-vim.git $jedi_vim_folder > /dev/null 2>&1
 else
-    git -C $jedi_vim_folder pull > /dev/null 2>&1
+    cgit -C $jedi_vim_folder pull > /dev/null 2>&1
 fi
 
 terraform_vim_folder=~/.vim/bundle/vim-terraform
 if [ ! -d $terraform_vim_folder ]; then
     cprint "Terraform-vim not found. Installing it now..."
     mkdir -p $terraform_vim_folder
-    git clone https://github.com/hashivim/vim-terraform.git $terraform_vim_folder > /dev/null 2>&1
+    cgit clone https://github.com/hashivim/vim-terraform.git $terraform_vim_folder > /dev/null 2>&1
 else
-    git -C $terraform_vim_folder pull > /dev/null 2>&1
+    cgit -C $terraform_vim_folder pull > /dev/null 2>&1
 fi
 
 logstash_vim_folder=~/.vim/logstash.vim
 if [ ! -d $logstash_vim_folder ]; then
     cprint "logstash.vim not found. Installing it now..."
     mkdir -p $logstash_vim_folder
-    git clone https://github.com/robbles/logstash.vim $logstash_vim_folder > /dev/null 2>&1
+    cgit clone https://github.com/robbles/logstash.vim $logstash_vim_folder > /dev/null 2>&1
     mkdir -p ~/.vim/syntax > /dev/null 2>&1
     mkdir -p ~/.vim/ftdetect > /dev/null 2>&1
     ln -f -s $logstash_vim_folder/syntax/logstash.vim $logstash_vim_folder/../syntax/logstash.vim
     ln -f -s $logstash_vim_folder/ftdetect/logstash.vim $logstash_vim_folder/../ftdetect/logstash.vim
 else
-    git -C $logstash_vim_folder pull > /dev/null 2>&1
+    cgit -C $logstash_vim_folder pull > /dev/null 2>&1
 fi
 
 if [[ ! -f ~/.vim/syntax/groovy.vim ]]; then
     cprint "groovy.vim not found. Installing it now..."
-    curl -s --max-time 5 -o ~/.vim/syntax/groovy.vim http://www.vim.org/scripts/download_script.php?src_id=2926
+    ccurl -s --max-time 5 -o ~/.vim/syntax/groovy.vim http://www.vim.org/scripts/download_script.php?src_id=2926
 fi
 
 # If the azure completion file exists, load it
@@ -312,9 +330,9 @@ tpm_folder=~/.tmux/plugins/tpm
 if [ ! -d $tpm_folder ]; then
     cprint "Tmux Plugin Manager not found. Installing it now..."
     mkdir -p $tpm_folder
-    git clone https://github.com/tmux-plugins/tpm $tpm_folder > /dev/null 2>&1
+    cgit clone https://github.com/tmux-plugins/tpm $tpm_folder > /dev/null 2>&1
 else
-    git -C $tpm_folder pull > /dev/null 2>&1
+    cgit -C $tpm_folder pull > /dev/null 2>&1
 fi
 
 ## Try to re-mount the dev8 dpopes home directory (may fail if already mounted, but doesn't hurt)
