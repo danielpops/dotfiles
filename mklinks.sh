@@ -23,4 +23,4 @@ if [ -h ~/$htoprc ]; then
     mv ~/$htoprc ~/$htoprc.bak
 fi
 echo "Linking ~/$htoprc to $(pwd)/$htoprc..."
-mkdir ln -s -f -d $(pwd)/.config/htop/htoprc ~/.config/htop/htoprc
+ln -s -f -d $(pwd)/.config/htop/htoprc ~/.config/htop/htoprc
