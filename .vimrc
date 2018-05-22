@@ -217,6 +217,9 @@ set wildignore=*.o,*.pyc
 " Make it easy to toggle between showing whitespace, eol, etc...
 nmap <silent> <leader>w :set nolist!<CR>
 
+" Try to eliminate dependency on <Esc> key
+imap jj <Esc>
+
 " Vi-style editing in the command-line (kind of annoying)
 "nnoremap : q:a
 "nnoremap / q/a
