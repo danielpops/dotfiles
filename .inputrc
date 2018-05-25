@@ -1,6 +1,10 @@
+# TODO Eventually try out more things http://vim.wikia.com/wiki/Use_vi_shortcuts_in_terminal
 set editing-mode vi
 "\e[1;5D": backward-word
 "\e[1;5C": forward-word
+
+# Like imap jj <Esc>
+"jj": "\e"
 
 #"\e????": beginning-of-line
 #"\e????": end-of-line
