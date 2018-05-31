@@ -296,7 +296,7 @@ fi
 
 if [[ ! -f ~/.vim/syntax/groovy.vim ]]; then
     cprint "groovy.vim not found. Installing it now..."
-    ccurl -s --max-time 5 -o ~/.vim/syntax/groovy.vim http://www.vim.org/scripts/download_script.php?src_id=2926
+    ccurl -s -L --max-time 5 -o ~/.vim/syntax/groovy.vim http://www.vim.org/scripts/download_script.php?src_id=2926
 fi
 
 # If the azure completion file exists, load it
