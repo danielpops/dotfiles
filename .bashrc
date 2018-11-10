@@ -230,6 +230,16 @@ if [[ $? != 0 ]]; then
     git config --global merge.conflictstyle diff3
 fi
 
+# Set defaults for git author info
+git config --global --get user.email > /dev/null
+if [[ $? != 0 ]]; then
+    git config --global user.email "danielpops@gmail.com"
+fi
+git config --global --get user.name > /dev/null
+if [[ $? != 0 ]]; then
+    git config --global user.name "Daniel Popescu"
+fi
+
 # Vim related stuff
 # Set up pathogen and syntastic, if they don't already exist:
 
