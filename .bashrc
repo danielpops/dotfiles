@@ -54,11 +54,11 @@ mac=false
 linux=false
 unknown=false
 
-if [ $platform = 'Darwin' ]; then
+if [[ $platform = 'Darwin' ]]; then
     #cprint "uname==>$platform so we must be running on a mac"
     platform='osx'
     mac=true
-elif [ $platform = 'Linux' ]; then
+elif [[ $platform = 'Linux' ]]; then
     #cprint "uname==>$platform so we must be running on a linux machine"
     platform='linux'
     linux=true
@@ -147,11 +147,11 @@ export PROMPT_COMMAND="history -a"
 # You may want to put all your additions into a separate file like
 # ~/.bash_aliases, instead of adding them here directly.
 
-if [ -f ~/.bash_aliases ]; then
+if [[ -f ~/.bash_aliases ]]; then
     . ~/.bash_aliases
 fi
 
-if [ $mac = true ]; then
+if [[ $mac = true ]]; then
     export PS1="\[$BBlue\]\u@\[$BGreen\]\h:\[$BYellow\]\w\[$BCyan\]\$(__git_ps1)\[$BPurple\] [\t]"
 
     # On mac, change the default wifi login screen application so that it opens in the regular browser
@@ -164,7 +164,7 @@ if [ $mac = true ]; then
     fi
 fi
 
-if [ $linux = true ]; then
+if [[ $linux = true ]]; then
     if grep -q git_ps1 <<<$PS1
     then
         export PS1="\[$BBlue\]\u@\[$BGreen\]\h:\[$BYellow\]\w\[$BCyan\]\$(__git_ps1)\[$BPurple\] [\t]"
@@ -173,7 +173,7 @@ if [ $linux = true ]; then
     fi
 
     # enable bash completion in interactive shells
-    if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
+    if [[ -f /etc/bash_completion ]] && ! shopt -oq posix; then
         . /etc/bash_completion
     fi
 fi
@@ -182,13 +182,13 @@ PS1+="\$(RET=\$?; if [[ \$RET != 0 ]]; then echo -n \"\[$BRed\] $FancyX \"; else
 
 # Check if brew is installed
 which brew > /dev/null
-if [ $? = 0 ]; then
+if [[ $? = 0 ]]; then
     # Since brew is installed, check for a few things that we like to use
     # such as bash completion and git prompt completion
 
     brew_path=$(brew --prefix)
     git_prompt=$brew_path/etc/bash_completion.d/git-prompt.sh
-    if [ ! -f $git_prompt ]; then
+    if [[ ! -f $git_prompt ]]; then
         cprint "Couldn't find bash-git-prompt script at $git_prompt --> Installing it now..."
         brew install bash-git-prompt
     fi
@@ -196,7 +196,7 @@ if [ $? = 0 ]; then
     . $git_prompt
 
     bash_completion=$brew_path/etc/bash_completion
-    if [ ! -f $bash_completion ]; then
+    if [[ ! -f $bash_completion ]]; then
         cprint "Couldn't find bash_completion script --> Installing it now..."
         brew install bash-completion
     fi
@@ -206,7 +206,7 @@ fi
 
 # If the environment doesn't already have the __git_ps1 alias set up, then explicitly set it
 type __git_ps1 &> /dev/null
-if [ $? != 0  ]; then
+if [[ $? != 0  ]]; then
   alias __git_ps1="git branch 2>/dev/null | grep '*' | sed 's/* \(.*\)/(\1)/'"
 fi
 
@@ -214,19 +214,19 @@ fi
 
 # .gitignore
 git config --global --get core.excludesfile >/dev/null
-if [ $? != 0 ]; then
+if [[ $? != 0 ]]; then
     git config --global core.excludesfile ~/.gitignore
 fi
 
 # `git my` alias
 git config --global --get alias.my >/dev/null
-if [ $? != 0 ]; then
+if [[ $? != 0 ]]; then
     git config --global alias.my "log --author=$(whoami)"
 fi
 
 # use diff3 format for merge conflicts
 git config --global --get merge.conflictstyle >/dev/null
-if [ $? != 0 ]; then
+if [[ $? != 0 ]]; then
     git config --global merge.conflictstyle diff3
 fi
 
@@ -234,7 +234,7 @@ fi
 # Set up pathogen and syntastic, if they don't already exist:
 
 pathogen_file=~/.vim/autoload/pathogen.vim
-if [ ! -f $pathogen_file ]; then
+if [[ ! -f $pathogen_file ]]; then
     cprint "Pathogen not found. Installing it now..."
     mkdir -p ~/.vim/autoload ~/.vim/bundle && \
     ccurl -LSso $pathogen_file https://raw.githubusercontent.com/tpope/vim-pathogen/master/autoload/pathogen.vim
@@ -242,14 +242,14 @@ fi
 
 # Systastic caused too many problems... revisit later!
 #syntastic_folder=~/.vim/bundle/syntastic
-#if [ ! -d $syntastic_folder ]; then
+#if [[ ! -d $syntastic_folder ]]; then
 #    cprint "Systastic not found. Installing it now..."
 #    mkdir -p $syntastic_folder
 #    git clone https://github.com/scrooloose/syntastic.git $syntastic_folder > /dev/null 2>&1
 #fi
 
 puppet_vim_folder=~/.vim/bundle/vim-puppet
-if [ ! -d $puppet_vim_folder ]; then
+if [[ ! -d $puppet_vim_folder ]]; then
     cprint "Puppet-vim not found. Installing it now..."
     mkdir -p $puppet_vim_folder
     cgit clone https://github.com/rodjek/vim-puppet.git $puppet_vim_folder > /dev/null 2>&1
@@ -258,7 +258,7 @@ else
 fi
 
 docker_vim_folder=~/.vim/bundle/Dockerfile
-if [ ! -d $docker_vim_folder ]; then
+if [[ ! -d $docker_vim_folder ]]; then
     cprint "Dockerfile.vim not found. Installing it now..."
     mkdir -p $docker_vim_folder
     cgit clone https://github.com/ekalinin/Dockerfile.vim.git $docker_vim_folder > /dev/null 2>&1
@@ -267,7 +267,7 @@ else
 fi
 
 jedi_vim_folder=~/.vim/bundle/jedi-vim
-if [ ! -d $jedi_vim_folder ]; then
+if [[ ! -d $jedi_vim_folder ]]; then
     cprint "jedi-vim not found. Installing it now..."
     mkdir -p $jedi_vim_folder
     cgit clone --recursive https://github.com/davidhalter/jedi-vim.git $jedi_vim_folder > /dev/null 2>&1
@@ -276,7 +276,7 @@ else
 fi
 
 terraform_vim_folder=~/.vim/bundle/vim-terraform
-if [ ! -d $terraform_vim_folder ]; then
+if [[ ! -d $terraform_vim_folder ]]; then
     cprint "Terraform-vim not found. Installing it now..."
     mkdir -p $terraform_vim_folder
     cgit clone https://github.com/hashivim/vim-terraform.git $terraform_vim_folder > /dev/null 2>&1
@@ -285,7 +285,7 @@ else
 fi
 
 logstash_vim_folder=~/.vim/logstash.vim
-if [ ! -d $logstash_vim_folder ]; then
+if [[ ! -d $logstash_vim_folder ]]; then
     cprint "logstash.vim not found. Installing it now..."
     mkdir -p $logstash_vim_folder
     cgit clone https://github.com/robbles/logstash.vim $logstash_vim_folder > /dev/null 2>&1
@@ -303,11 +303,11 @@ if [[ ! -f ~/.vim/syntax/groovy.vim ]]; then
 fi
 
 # If the azure completion file exists, load it
-if [ ! -f ~/.azure.completion.sh ]; then
+if [[ ! -f ~/.azure.completion.sh ]]; then
     which azure > /dev/null
-    if [ $? = 0 ]; then
+    if [[ $? = 0 ]]; then
         azure --completion > ~/.azure.completion.sh
-        if [ $? = 0 ]; then
+        if [[ $? = 0 ]]; then
             source ~/.azure.completion.sh
         fi
         rm -rf ~/.azure.completion.sh
@@ -316,7 +316,7 @@ fi
 
 # If the aws completion file exists, load it
 which aws_completer > /dev/null
-if [ $? = 0 ]; then
+if [[ $? = 0 ]]; then
     AWS_COMPLETER=$(which aws_completer)
 else
     if [[ -f /opt/venvs/aws-cli/bin/aws_completer ]]; then
@@ -330,7 +330,7 @@ fi
 
 # Tmux Plugin Manager
 tpm_folder=~/.tmux/plugins/tpm
-if [ ! -d $tpm_folder ]; then
+if [[ ! -d $tpm_folder ]]; then
     cprint "Tmux Plugin Manager not found. Installing it now..."
     mkdir -p $tpm_folder
     cgit clone https://github.com/tmux-plugins/tpm $tpm_folder > /dev/null 2>&1
@@ -357,7 +357,7 @@ whereami() {
     done
     (counter++)
     head -1 $directory/$f
-    if [ $f != 'habitat' ]; then
+    if [[ $f != 'habitat' ]]; then
       cprint
     fi
   done
