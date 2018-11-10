@@ -155,12 +155,19 @@ if [[ $mac = true ]]; then
     export PS1="\[$BBlue\]\u@\[$BGreen\]\h:\[$BYellow\]\w\[$BCyan\]\$(__git_ps1)\[$BPurple\] [\t]"
 
     # On mac, change the default wifi login screen application so that it opens in the regular browser
-    # This will eval "Active=0;" or "Active=1" depending on whether or not this is already disabled
-    eval $(defaults read /Library/Preferences/SystemConfiguration/com.apple.captive.control | grep ^[^{}] | sed 's/ //g')
+    CAPTIVE_PORTAL_ACTIVE=$(defaults read /Library/Preferences/SystemConfiguration/com.apple.captive.control Active)
 
-    if [ $Active = '1' ]; then
+    if [[ $? -ne 0 ]] || [[ $CAPTIVE_PORTAL_ACTIVE -eq 1 ]]; then
         cprint "Disabling com.apple.captive.control so that the default wifi login screen app is a regular browser..."
         sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.captive.control Active -boolean false
+    fi
+
+    # On mac, by default, holding down a key brings up the alternate character menu
+    # Change it so that it just sends the repeated keystrokes
+    PRESS_AND_HOLD_ENABLED=$(defaults read NSGlobalDomain ApplePressAndHoldEnabled)
+
+    if [[ $? -ne 0 ]] || [[ $PRESS_AND_HOLD_ENABLED -eq 1 ]]; then
+        defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
     fi
 fi
 
