@@ -88,3 +88,7 @@ if [ $linux = true ]; then
     alias pbcopy='ssh -A localhost -p 33733 -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no pbcopy 2> /dev/null'
 fi
 
+
+alias dev="ssh -A -R 33733:localhost:22 dev21-uswest1cdevc -t 'agenttmux a -t everything'"
+alias awsdev="ssh -A -R 33733:localhost:22 aws.danielpops.com -t 'agenttmux a -t everything'"
+alias dodev="ssh -A -R 33733:localhost:22 danielpops.com -t 'agenttmux a -t everything'"
