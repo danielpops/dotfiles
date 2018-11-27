@@ -25,3 +25,17 @@ fi
 echo "Linking ~/$htoprc to $(pwd)/$htoprc..."
 mkdir -p ~/.config/htop 2> /dev/null
 ln -s -f -d $(pwd)/.config/htop/htoprc ~/.config/htop/htoprc
+
+karabiner_json=.config/karabiner/karabiner.json
+if [ -a ~/$karabiner_json]; then
+    echo "File ~/$karabiner_json exists... Renaming it!"
+    mv ~/$karabiner_json ~/$karabiner_json.bak
+fi
+if [ -h ~/$karabiner_json ]; then
+    echo "File ~/$karabiner_json exists and is a symbolic link... Renaming it!"
+    mv ~/$karabiner_json ~/$karabiner_json.bak
+fi
+
+echo "Linking ~/$karabiner_json to $(pwd)/$karabiner_json ..."
+mkdir -p ~/.config/karabiner 2> /dev/null
+ln -s -f -d $(pwd)/$karabiner_json ~/$karabiner_json
