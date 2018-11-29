@@ -34,7 +34,7 @@
                         ]
                     },
                     {
-                        "description": "Send CMD+[ with mouse button 5",
+                        "description": "Send CMD+] with mouse button 5",
                         "manipulators": [
                             {
                                 "from": {
