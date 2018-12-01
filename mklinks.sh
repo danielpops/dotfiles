@@ -24,7 +24,7 @@ if [ -h ~/$htoprc ]; then
 fi
 echo "Linking ~/$htoprc to $(pwd)/$htoprc..."
 mkdir -p ~/.config/htop 2> /dev/null
-ln -s -f -d $(pwd)/.config/htop/htoprc ~/.config/htop/htoprc
+ln -s -f $(pwd)/.config/htop/htoprc ~/.config/htop/htoprc
 
 karabiner_json=.config/karabiner/karabiner.json
 if [ -a ~/$karabiner_json]; then
@@ -38,4 +38,4 @@ fi
 
 echo "Linking ~/$karabiner_json to $(pwd)/$karabiner_json ..."
 mkdir -p ~/.config/karabiner 2> /dev/null
-ln -s -f -d $(pwd)/$karabiner_json ~/$karabiner_json
+ln -s -f $(pwd)/$karabiner_json ~/$karabiner_json
