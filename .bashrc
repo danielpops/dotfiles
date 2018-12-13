@@ -355,36 +355,6 @@ else
     cgit -C $tpm_folder pull > /dev/null 2>&1
 fi
 
-## Try to re-mount the dev8 dpopes home directory (may fail if already mounted, but doesn't hurt)
-## This is too specific to my work dev laptop. Consider removing it or addressing it some other way
-#dev_host=dev8-uswest1cdevc
-#mkdir -p ~/dev/${dev_host}
-#sshfs -o reconnect dpopes@${dev_host}:/nail/home/dpopes/ ~/dev/${dev_host} 2>/dev/null
-# Keeping the 'unmount' command here for reference:
-# diskutil unmountDisk force /Volumes/DISK_NAME
-
-# Add convenience script for printing out "where you are"
-whereami() {
-  directory="/nail/etc/"
-  counter=1
-  for f in runtimeenv ecosystem superregion region habitat; do
-    cprint $f:
-    for (( c=0; c<$counter; c++ )); do
-      printf ">"
-    done
-    (counter++)
-    head -1 $directory/$f
-    if [[ $f != 'habitat' ]]; then
-      cprint
-    fi
-  done
-  cprint hostname:
-  for (( c=0; c<$counter; c++ )); do
-    printf ">"
-  done
-  hostname
-}
-
 cprint -ne "\033]0;${USER}@${HOSTNAME}: ${PWD}\007"
 
 __expand_tilde_by_ref() {
