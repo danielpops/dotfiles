@@ -142,6 +142,7 @@ shopt -s histappend
 
 # Force commands to flush to bash history file after each command
 export PROMPT_COMMAND="history -a"
+export PROMPT_COMMAND='if [ -x /usr/bin/aactivator ]; then  eval "$(/usr/bin/aactivator)"; fi'"; $PROMPT_COMMAND"
 
 # Aliases
 # You may want to put all your additions into a separate file like
