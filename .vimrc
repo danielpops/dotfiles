@@ -175,6 +175,9 @@ autocmd BufNewFile,BufRead *.tf set ft=yaml
 " Associate *.conf with json filetype
 autocmd BufNewFile,BufRead *.conf set ft=javascript
 
+" Associate *.rego with json filetype
+autocmd BufNewFile,BufRead *.rego set ft=javascript
+
 " Associate *.groovy with groovy syntax
 autocmd BufNewFile,BufRead *.groovy  setf groovy
 
