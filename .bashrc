@@ -170,6 +170,11 @@ if [[ $mac = true ]]; then
     if [[ $? -ne 0 ]] || [[ $PRESS_AND_HOLD_ENABLED -eq 1 ]]; then
         defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
     fi
+
+    # Better / actually usable key repeat values. These don't really need to be in bashrc and they
+    # require a logout + login to take effect, but putting these here for my own reference in the future
+    defaults write -g InitialKeyRepeat -int 12 # normal minimum is 15 (225 ms)
+    defaults write -g KeyRepeat -int 1 # normal minimum is 2 (30 ms)
 fi
 
 if [[ $linux = true ]]; then
