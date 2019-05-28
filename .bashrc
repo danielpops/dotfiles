@@ -173,6 +173,7 @@ if [[ $mac = true ]]; then
 
     # Better / actually usable key repeat values. These don't really need to be in bashrc and they
     # require a logout + login to take effect, but putting these here for my own reference in the future
+    # https://apple.stackexchange.com/a/83923/174038
     defaults write -g InitialKeyRepeat -int 12 # normal minimum is 15 (225 ms)
     defaults write -g KeyRepeat -int 1 # normal minimum is 2 (30 ms)
 fi
