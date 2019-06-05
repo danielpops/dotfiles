@@ -153,7 +153,7 @@ if [[ -f ~/.bash_aliases ]]; then
 fi
 
 if [[ $mac = true ]]; then
-    export PS1="\[$BBlue\]\u@\[$BGreen\]\h:\[$BYellow\]\w\[$BCyan\]\$(__git_ps1)\[$BPurple\] [\t]"
+    export PS1="\[$BBlue\]\u@\[$BGreen\]\h:\[$BYellow\]\w\[$BCyan\]\$(__git_ps1)"
 
     # On mac, change the default wifi login screen application so that it opens in the regular browser
     CAPTIVE_PORTAL_ACTIVE=$(defaults read /Library/Preferences/SystemConfiguration/com.apple.captive.control Active)
@@ -179,11 +179,18 @@ if [[ $mac = true ]]; then
 fi
 
 if [[ $linux = true ]]; then
+    # Add puppet role information if it exists
+    ROLE=unknown
+    if [[ ! -z /nail/etc/role ]]; then
+        ROLE=$(cat /nail/etc/role)
+        #PS1+="\$(echo -n \[$Color_Off\] \($(cat /nail/etc/role)\) )"
+    fi
+
     if grep -q git_ps1 <<<$PS1
     then
-        export PS1="\[$BBlue\]\u@\[$BGreen\]\h:\[$BYellow\]\w\[$BCyan\]\$(__git_ps1)\[$BPurple\] [\t]"
+        export PS1="\[$BBlue\]\u@\[$BGreen\]\h \[$BPurple\]($ROLE)\[$Color_Off\]:\[$BYellow\]\w\[$BCyan\]\$(__git_ps1)"
     else
-        export PS1="\[$BBlue\]\u@\[$BGreen\]\h:\[$BYellow\]\w\[$BCyan\]\$(__git_ps1)\[$BPurple\] [\t]"
+        export PS1="\[$BBlue\]\u@\[$BGreen\]\h \[$BPurple\]($ROLE)\[$Color_Off\]:\[$BYellow\]\w\[$BCyan\]\$(__git_ps1)"
     fi
 
     # enable bash completion in interactive shells
@@ -191,6 +198,8 @@ if [[ $linux = true ]]; then
         . /etc/bash_completion
     fi
 fi
+
+PS1+="\[$BPurple\] [\t]"
 
 PS1+="\$(RET=\$?; if [[ \$RET != 0 ]]; then echo -n \"\[$BRed\] $FancyX \"; else echo -n \"\[$BGreen\] $Checkmark\"; fi)\[$Color_Off\]\r\n\\$ "
 
