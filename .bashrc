@@ -193,13 +193,12 @@ if [[ $linux = true ]]; then
         export PS1="\[$BBlue\]\u@\[$BGreen\]\h \[$BPurple\]($ROLE)\[$Color_Off\]:\[$BYellow\]\w\[$BCyan\]\$(__git_ps1)"
     fi
 
-    # enable bash completion in interactive shells
-    if [[ -f /etc/bash_completion ]] && ! shopt -oq posix; then
-        . /etc/bash_completion
-    fi
-    if [[ -f /etc/bash_completion.d/git ]] && ! shopt -oq posix; then
-        . /etc/bash_completion.d/git
-    fi
+    # enable bash completion for various things in interactive shells
+    for file in /etc/bash_completion /etc/bash_completion.d/git; do
+        if [[ -f $file ]] && ! shopt -oq posix; then
+            . $file
+        fi
+    done
 fi
 
 PS1+="\[$BPurple\] [\t]"
