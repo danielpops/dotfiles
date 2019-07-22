@@ -184,6 +184,10 @@ autocmd BufNewFile,BufRead *.groovy  setf groovy
 " Associate Jenkinsfile with groovy syntax
 autocmd BufNewFile,BufRead Jenkinsfile setf groovy
 
+" In go files, don't expand tabs to spaces, since actual tab characters
+" appear to be more preffered (??)
+autocmd FileType go set noexpandtab shiftwidth=4 softtabstop=0
+
 " In makefiles, don't expand tabs to spaces, since actual tab characters are
 " needed, and have indentation at 8 chars to be sure that all indents are tabs
 autocmd FileType make set noexpandtab shiftwidth=8 softtabstop=0
