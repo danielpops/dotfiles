@@ -124,7 +124,12 @@ Checkmark='\342\234\223'
 export CLICOLOR=1
 export LSCOLORS=ExFxBxDxCxegedabagacad
 export PATH="/usr/local/sbin:$PATH"
+export GOPATH=$(echo ~/go)
+export GOBIN=${GOPATH}/bin
+export PATH=${PATH}:${GOBIN}
 export PAGER=less
+
+mkdir -p ${GOPATH}
 
 # Bash history customizations
 
