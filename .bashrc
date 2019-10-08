@@ -136,11 +136,11 @@ mkdir -p ${GOPATH}
 # Avoid duplicates
 export HISTCONTROL=ignoredups:erasedups
 
-# big big history (default is 10000)
-export HISTSIZE=100000
+# unlimited history (default is 10000, negative means disable)
+export HISTSIZE=-1
 
-# big big history (default is 10000)
-export HISTFILESIZE=100000
+# unlimited history (default is 10000, negative means disable)
+export HISTFILESIZE=-1
 
 # Configure history in "append" mode
 shopt -s histappend
