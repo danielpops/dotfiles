@@ -11,5 +11,8 @@ cprint "Loading ~/.bash_profile"
 
 # If the ~/.bashrc file exists, then load it
 if [ -f ~/.bashrc ]; then
-   source ~/.bashrc
+   # sourcing .bashrc was causing terminal to hang on osx catalina
+   # exec bash seemed to achieve the desired behavior without hanging
+   #source ~/.bashrc
+   exec bash
 fi
