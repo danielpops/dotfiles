@@ -186,7 +186,7 @@ fi
 if [[ $linux = true ]]; then
     # Add puppet role information if it exists
     ROLE=unknown
-    if [[ -e /nail/etc/role ]]; then
+    if [[ ! -z /nail/etc/role ]]; then
         ROLE=$(cat /nail/etc/role)
         #PS1+="\$(echo -n \[$Color_Off\] \($(cat /nail/etc/role)\) )"
     fi
@@ -287,6 +287,16 @@ fi
 #    mkdir -p $syntastic_folder
 #    git clone https://github.com/scrooloose/syntastic.git $syntastic_folder > /dev/null 2>&1
 #fi
+
+shellcheck_vim_folder=~/.vim/bundle/shellcheck
+if [[ ! -d $shellcheck_vim_folder ]]; then
+    cprint "Shellcheck vim not found. Installing it now..."
+    mkdir -p $shellcheck_vim_folder
+    cgit clone https://github.com/itspriddle/vim-shellcheck.git $shellcheck_vim_folder > /dev/null 2>&1
+    vim -u NONE -c "helptags vim-shellcheck/doc" -c q
+else
+    cgit -C $shellcheck_vim_folder pull > /dev/null 2>&1
+fi
 
 puppet_vim_folder=~/.vim/bundle/vim-puppet
 if [[ ! -d $puppet_vim_folder ]]; then
