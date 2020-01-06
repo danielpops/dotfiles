@@ -293,7 +293,7 @@ if [[ ! -d $shellcheck_vim_folder ]]; then
     cprint "Shellcheck vim not found. Installing it now..."
     mkdir -p $shellcheck_vim_folder
     cgit clone https://github.com/itspriddle/vim-shellcheck.git $shellcheck_vim_folder > /dev/null 2>&1
-    vim -u NONE -c "helptags vim-shellcheck/doc" -c q
+    #vim -u NONE -c "helptags vim-shellcheck/doc" -c q
 else
     cgit -C $shellcheck_vim_folder pull > /dev/null 2>&1
 fi
