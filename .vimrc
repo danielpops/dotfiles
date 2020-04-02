@@ -167,10 +167,10 @@ let $BASH_ENV = "~/.bash_aliases"
 autocmd BufRead,BufNewFile *.disabled setfiletype yaml
 
 " Associate *.pp with json filetype
-autocmd BufNewFile,BufRead *.pp set ft=javascript
+autocmd BufNewFile,BufRead *.pp set ft=javascript tabstop=2 softtabstop=2 shiftwidth=2
 
 " Associate *.tf with json filetype
-autocmd BufNewFile,BufRead *.tf set ft=yaml
+autocmd BufNewFile,BufRead *.tf set ft=yaml tabstop=2 softtabstop=2 shiftwidth=2
 
 " Associate *.conf with json filetype
 autocmd BufNewFile,BufRead *.conf set ft=javascript
