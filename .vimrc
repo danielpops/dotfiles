@@ -171,6 +171,9 @@ autocmd BufNewFile,BufRead *.pp set ft=javascript tabstop=2 softtabstop=2 shiftw
 
 " Associate *.tf with json filetype
 autocmd BufNewFile,BufRead *.tf set ft=yaml tabstop=2 softtabstop=2 shiftwidth=2
+"
+" Associate *.tf with json filetype
+autocmd BufNewFile,BufRead *.hcl set ft=yaml tabstop=2 softtabstop=2 shiftwidth=2
 
 " Associate *.conf with json filetype
 autocmd BufNewFile,BufRead *.conf set ft=javascript
