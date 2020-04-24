@@ -181,6 +181,12 @@ if [[ $mac = true ]]; then
     # https://apple.stackexchange.com/a/83923/174038
     defaults write -g InitialKeyRepeat -int 12 # normal minimum is 15 (225 ms)
     defaults write -g KeyRepeat -int 1 # normal minimum is 2 (30 ms)
+
+    # Try to pre-emptively add the ssh key(s) to the trust store
+    ssh-add -l -q | grep -q "The agent has no identities"
+    if [[ $? -eq 0 ]]; then
+        ssh-add -k
+    fi
 fi
 
 if [[ $linux = true ]]; then
