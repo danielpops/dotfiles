@@ -88,7 +88,7 @@ if [ $linux = true ]; then
     alias testify='testify -x disabled'
 
     # Shortcut for accessing my remote originating ssh session and getting text on my clipboard
-    alias pbcopy='ssh -A localhost -p 33733 -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no pbcopy 2> /dev/null'
+    alias pbcopy='ssh -A localhost -p 33733 -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no nc localhost 33733 2> /dev/null'
 fi
 
 
