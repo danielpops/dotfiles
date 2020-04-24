@@ -1,0 +1,7 @@
+# To get clipboard shenanigans working in a launchd service, you have to make sure it's launched in the correct domain
+# So we use `launchctl bootstrap` with `gui` to indicate the domain target of the logged in user's UI app domain
+# the 570197778 is the local unix user id
+launchctl bootstrap gui/570197778 ~/Library/LaunchAgents/com.dpopes.clipproxy.plist
+
+# So to make this work on any laptop generically:
+launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.dpopes.clipproxy.plist
