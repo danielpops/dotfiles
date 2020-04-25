@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+    <dict>
+    <key>Label</key>
+    <string>local.pbcopy</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/sh</string>
+        <string>-c</string>
+        <string>LC_CTYPE=en_US.UTF-8 pbcopy</string>
+    </array>
+    <key>Sockets</key>
+    <dict>
+        <key>Listeners</key>
+        <dict>
+        <key>SockNodeName</key>
+        <string>127.0.0.1</string>
+        <key>SockServiceName</key>
+        <string>33733</string>
+        </dict>
+    </dict>
+    <key>inetdCompatibility</key>
+    <dict>
+        <key>Wait</key>
+        <false/>
+    </dict>
+    </dict>
+</plist>

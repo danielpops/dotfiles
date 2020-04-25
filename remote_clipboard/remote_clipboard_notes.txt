@@ -1,7 +1,16 @@
+# The approach to get things in to the correct "domain" took hours of futzing about, finally found this very useful gist that explains target domains https://gist.github.com/masklinn/a532dfe55bdeab3d60ab8e46ccc38a68
+# The approach of using native launchd "Listeners" functionality was inspired by https://gist.github.com/jclosure/19698429dda1105b8a93b0832c07ebc7
+
 # To get clipboard shenanigans working in a launchd service, you have to make sure it's launched in the correct domain
 # So we use `launchctl bootstrap` with `gui` to indicate the domain target of the logged in user's UI app domain
 # the 570197778 is the local unix user id
-launchctl bootstrap gui/570197778 ~/Library/LaunchAgents/com.dpopes.clipproxy.plist
+# No sudo needed since it's loaded into ones own namespace
 
-# So to make this work on any laptop generically:
-launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.dpopes.clipproxy.plist
+# Load is handled by
+launchctl bootstrap gui/570197778 ~/Library/LaunchAgents/local.pbcopy.plist
+
+# Unload is handled by
+launchctl unload ~/Library/LaunchAgents/local.pbcopy.plist
+
+# So to make this work generically:
+launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/local.pbcopy.plist
