@@ -192,7 +192,7 @@ fi
 if [[ $linux = true ]]; then
     # Add puppet role information if it exists
     ROLE=unknown
-    if [[ ! -z /nail/etc/role ]]; then
+    if [[ -f /nail/etc/role ]]; then
         ROLE=$(cat /nail/etc/role)
         #PS1+="\$(echo -n \[$Color_Off\] \($(cat /nail/etc/role)\) )"
     fi
