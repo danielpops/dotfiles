@@ -25,7 +25,7 @@ set list
 set listchars=tab:>-,trail:·,extends:>,precedes:<,eol:$
 
 " Allows you to deal with multiple unsaved buffers
-" simultaneously without resoring to misusing tabs
+" simultaneously without resorting to misusing tabs
 set hidden
 
 set backspace=indent,eol,start
@@ -248,3 +248,7 @@ let g:terraform_align=1
 
 " Give a shortcut for formatting valid json inside vim
 com! JSON %!python -m json.tool
+
+
+" Easily toggle spelling
+command Spell setlocal spell! spelllang=en_us
