@@ -329,6 +329,7 @@ if [[ ! -d $jedi_vim_folder ]]; then
     cgit clone --recursive https://github.com/davidhalter/jedi-vim.git $jedi_vim_folder > /dev/null 2>&1
 else
     cgit -C $jedi_vim_folder pull > /dev/null 2>&1
+    cgit submodule update
 fi
 
 terraform_vim_folder=~/.vim/bundle/vim-terraform
