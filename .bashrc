@@ -279,12 +279,12 @@ fi
 # Vim related stuff
 # Set up pathogen and syntastic, if they don't already exist:
 
-pathogen_file=~/.vim/autoload/pathogen.vim
-if [[ ! -f $pathogen_file ]]; then
-    cprint "Pathogen not found. Installing it now..."
-    mkdir -p ~/.vim/autoload ~/.vim/bundle && \
-    ccurl -LSso $pathogen_file https://raw.githubusercontent.com/tpope/vim-pathogen/master/autoload/pathogen.vim
-fi
+#pathogen_file=~/.vim/autoload/pathogen.vim
+#if [[ ! -f $pathogen_file ]]; then
+#    cprint "Pathogen not found. Installing it now..."
+#    mkdir -p ~/.vim/autoload ~/.vim/bundle && \
+#    ccurl -LSso $pathogen_file https://raw.githubusercontent.com/tpope/vim-pathogen/master/autoload/pathogen.vim
+#fi
 
 # Systastic caused too many problems... revisit later!
 #syntastic_folder=~/.vim/bundle/syntastic
@@ -294,65 +294,73 @@ fi
 #    git clone https://github.com/scrooloose/syntastic.git $syntastic_folder > /dev/null 2>&1
 #fi
 
-shellcheck_vim_folder=~/.vim/bundle/shellcheck
-if [[ ! -d $shellcheck_vim_folder ]]; then
-    cprint "Shellcheck vim not found. Installing it now..."
-    mkdir -p $shellcheck_vim_folder
-    cgit clone https://github.com/itspriddle/vim-shellcheck.git $shellcheck_vim_folder > /dev/null 2>&1
-    #vim -u NONE -c "helptags vim-shellcheck/doc" -c q
+vundle_vim_folder=~/.vim/bundle/Vundle.vim
+if [[ ! -d $vundle_vim_folder ]]; then
+    cprint "Vundle not found. Installing it now..."
+    mkdir -p $vundle_vim_folder
+    cgit clone https://github.com/VundleVim/Vundle.vim.git $vundle_vim_folder > /dev/null 2>&1
 else
-    cgit -C $shellcheck_vim_folder pull > /dev/null 2>&1
+    cgit -C $vundle_vim_folder pull > /dev/null 2>&1
 fi
-
-puppet_vim_folder=~/.vim/bundle/vim-puppet
-if [[ ! -d $puppet_vim_folder ]]; then
-    cprint "Puppet-vim not found. Installing it now..."
-    mkdir -p $puppet_vim_folder
-    cgit clone https://github.com/rodjek/vim-puppet.git $puppet_vim_folder > /dev/null 2>&1
-else
-    cgit -C $puppet_vim_folder pull > /dev/null 2>&1
-fi
-
-docker_vim_folder=~/.vim/bundle/Dockerfile
-if [[ ! -d $docker_vim_folder ]]; then
-    cprint "Dockerfile.vim not found. Installing it now..."
-    mkdir -p $docker_vim_folder
-    cgit clone https://github.com/ekalinin/Dockerfile.vim.git $docker_vim_folder > /dev/null 2>&1
-else
-    cgit -C $docker_vim_folder pull > /dev/null 2>&1
-fi
-
-jedi_vim_folder=~/.vim/bundle/jedi-vim
-if [[ ! -d $jedi_vim_folder ]]; then
-    cprint "jedi-vim not found. Installing it now..."
-    mkdir -p $jedi_vim_folder
-    cgit clone --recursive https://github.com/davidhalter/jedi-vim.git $jedi_vim_folder > /dev/null 2>&1
-else
-    cgit -C $jedi_vim_folder pull > /dev/null 2>&1
-    cgit -C $jedi_vim_folder submodule update
-fi
-
-terraform_vim_folder=~/.vim/bundle/vim-terraform
-if [[ ! -d $terraform_vim_folder ]]; then
-    cprint "Terraform-vim not found. Installing it now..."
-    mkdir -p $terraform_vim_folder
-    cgit clone https://github.com/hashivim/vim-terraform.git $terraform_vim_folder > /dev/null 2>&1
-else
-    cgit -C $terraform_vim_folder pull > /dev/null 2>&1
-fi
-
-logstash_vim_folder=~/.vim/logstash.vim
-if [[ ! -d $logstash_vim_folder ]]; then
-    cprint "logstash.vim not found. Installing it now..."
-    mkdir -p $logstash_vim_folder
-    cgit clone https://github.com/robbles/logstash.vim $logstash_vim_folder > /dev/null 2>&1
-    mkdir -p ~/.vim/syntax > /dev/null 2>&1
-    mkdir -p ~/.vim/ftdetect > /dev/null 2>&1
-    ln -f -s $logstash_vim_folder/syntax/logstash.vim $logstash_vim_folder/../syntax/logstash.vim
-    ln -f -s $logstash_vim_folder/ftdetect/logstash.vim $logstash_vim_folder/../ftdetect/logstash.vim
-else
-    cgit -C $logstash_vim_folder pull > /dev/null 2>&1
-fi
+#
+#puppet_vim_folder=~/.vim/bundle/vim-puppet
+#if [[ ! -d $puppet_vim_folder ]]; then
+#    cprint "Puppet-vim not found. Installing it now..."
+#    mkdir -p $puppet_vim_folder
+#    cgit clone https://github.com/rodjek/vim-puppet.git $puppet_vim_folder > /dev/null 2>&1
+#else
+#    cgit -C $puppet_vim_folder pull > /dev/null 2>&1
+#fi
+#
+#docker_vim_folder=~/.vim/bundle/Dockerfile
+#if [[ ! -d $docker_vim_folder ]]; then
+#    cprint "Dockerfile.vim not found. Installing it now..."
+#    mkdir -p $docker_vim_folder
+#    cgit clone https://github.com/ekalinin/Dockerfile.vim.git $docker_vim_folder > /dev/null 2>&1
+#else
+#    cgit -C $docker_vim_folder pull > /dev/null 2>&1
+#fi
+#
+#jedi_vim_folder=~/.vim/bundle/jedi-vim
+#if [[ ! -d $jedi_vim_folder ]]; then
+#    cprint "jedi-vim not found. Installing it now..."
+#    mkdir -p $jedi_vim_folder
+#    cgit clone --recursive https://github.com/davidhalter/jedi-vim.git $jedi_vim_folder > /dev/null 2>&1
+#else
+#    cgit -C $jedi_vim_folder pull > /dev/null 2>&1
+#    cgit -C $jedi_vim_folder submodule update
+#fi
+#
+#terraform_vim_folder=~/.vim/bundle/vim-terraform
+#if [[ ! -d $terraform_vim_folder ]]; then
+#    cprint "Terraform-vim not found. Installing it now..."
+#    mkdir -p $terraform_vim_folder
+#    cgit clone https://github.com/hashivim/vim-terraform.git $terraform_vim_folder > /dev/null 2>&1
+#else
+#    cgit -C $terraform_vim_folder pull > /dev/null 2>&1
+#fi
+#
+#jinja_vim_folder=~/.vim/bundle/vim-jinja
+#if [[ ! -d $jinja_vim_folder ]]; then
+#    cprint "Jinja-vim not found. Installing it now..."
+#    mkdir -p $jinja_vim_folder
+#    cgit clone https://github.com/lepture/vim-jinja.git $jinja_vim_folder > /dev/null 2>&1
+#else
+#    cgit -C $jinja_vim_folder pull > /dev/null 2>&1
+#fi
+#
+#logstash_vim_folder=~/.vim/logstash.vim
+#if [[ ! -d $logstash_vim_folder ]]; then
+#    cprint "logstash.vim not found. Installing it now..."
+#    mkdir -p $logstash_vim_folder
+#    cgit clone https://github.com/robbles/logstash.vim $logstash_vim_folder > /dev/null 2>&1
+#    mkdir -p ~/.vim/syntax > /dev/null 2>&1
+#    mkdir -p ~/.vim/ftdetect > /dev/null 2>&1
+#    ln -f -s $logstash_vim_folder/syntax/logstash.vim $logstash_vim_folder/../syntax/logstash.vim
+#    ln -f -s $logstash_vim_folder/ftdetect/logstash.vim $logstash_vim_folder/../ftdetect/logstash.vim
+#else
+#    cgit -C $logstash_vim_folder pull > /dev/null 2>&1
+#fi
 
 if [[ ! -f ~/.vim/syntax/groovy.vim ]]; then
     cprint "groovy.vim not found. Installing it now..."

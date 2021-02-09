@@ -10,6 +10,27 @@ syntax on
 " Filetype on
 filetype on
 
+" set the runtime path to include Vundle and initialize
+set rtp+=~/.vim/bundle/Vundle.vim
+call vundle#begin()
+" alternatively, pass a path where Vundle should install plugins
+"call vundle#begin('~/some/path/here')
+
+" let Vundle manage Vundle, required
+Plugin 'VundleVim/Vundle.vim'
+
+Plugin 'rodjek/vim-puppet'
+Plugin 'ekalinin/Dockerfile.vim'
+Plugin 'davidhalter/jedi-vim'
+Plugin 'hashivim/vim-terraform'
+Plugin 'lepture/vim-jinja'
+Plugin 'robbles/logstash.vim'
+Plugin 'tsandall/vim-rego'
+
+" All of your Plugins must be added before the following line
+call vundle#end()            " required
+filetype plugin indent on    " required
+
 " Prevent visual mode highlighting from hiding white text
 set background=dark
 
@@ -177,9 +198,6 @@ autocmd BufNewFile,BufRead *.hcl set ft=yaml tabstop=2 softtabstop=2 shiftwidth=
 
 " Associate *.conf with json filetype
 autocmd BufNewFile,BufRead *.conf set ft=javascript
-
-" Associate *.rego with json filetype
-autocmd BufNewFile,BufRead *.rego set ft=javascript
 
 " Associate *.groovy with groovy syntax
 autocmd BufNewFile,BufRead *.groovy  setf groovy
