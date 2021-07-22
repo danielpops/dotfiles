@@ -26,6 +26,7 @@ Plugin 'hashivim/vim-terraform'
 Plugin 'lepture/vim-jinja'
 Plugin 'robbles/logstash.vim'
 Plugin 'tsandall/vim-rego'
+Plugin 'axvr/org.vim'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
