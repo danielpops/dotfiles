@@ -158,6 +158,10 @@ if [[ -f ~/.bash_aliases ]]; then
 fi
 
 if [[ $mac = true ]]; then
+
+    # Disable the "zomg you should use zsh" nag message
+    export BASH_SILENCE_DEPRECATION_WARNING=1
+
     export PS1="\[$BBlue\]\u@\[$BGreen\]\h:\[$BYellow\]\w\[$BCyan\] \$(__git_ps1)"
 
     # On mac, change the default wifi login screen application so that it opens in the regular browser
@@ -284,11 +288,6 @@ if [[ ! -d $vundle_vim_folder ]]; then
     cgit clone https://github.com/VundleVim/Vundle.vim.git $vundle_vim_folder > /dev/null 2>&1
 else
     cgit -C $vundle_vim_folder pull > /dev/null 2>&1
-fi
-
-if [[ ! -f ~/.vim/syntax/groovy.vim ]]; then
-    cprint "groovy.vim not found. Installing it now..."
-    ccurl -s -L --max-time 5 -o ~/.vim/syntax/groovy.vim http://www.vim.org/scripts/download_script.php?src_id=2926
 fi
 
 # If the azure completion file exists, load it
