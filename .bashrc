@@ -180,6 +180,11 @@ if [[ $mac = true ]]; then
         defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
     fi
 
+    SHOW_ALL_FILES=$(defaults read com.apple.Finder AppleShowAllFiles)
+    if [[ $? -ne 0 ]] || [[ $SHOW_ALL_FILES -eq 1 ]]; then
+        defaults write com.apple.Finder AppleShowAllFiles -bool true
+    fi
+
     # Better / actually usable key repeat values. These don't really need to be in bashrc and they
     # require a logout + login to take effect, but putting these here for my own reference in the future
     # https://apple.stackexchange.com/a/83923/174038
