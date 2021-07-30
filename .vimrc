@@ -111,7 +111,7 @@ set autoread
 "execute pathogen#infect()
 "filetype off
 "filetype plugin indent on
-call pathogen#infect()
+"call pathogen#infect()
 syntax on
 filetype on
 filetype plugin on

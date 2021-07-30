@@ -27,7 +27,7 @@ mkdir -p ~/.config/htop 2> /dev/null
 ln -s -f $(pwd)/.config/htop/htoprc ~/.config/htop/htoprc
 
 karabiner_json=.config/karabiner/karabiner.json
-if [ -a ~/$karabiner_json]; then
+if [ -a ~/$karabiner_json ]; then
     echo "File ~/$karabiner_json exists... Renaming it!"
     mv ~/$karabiner_json ~/$karabiner_json.bak
 fi

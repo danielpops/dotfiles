@@ -158,7 +158,7 @@ if [[ -f ~/.bash_aliases ]]; then
 fi
 
 if [[ $mac = true ]]; then
-    export PS1="\[$BBlue\]\u@\[$BGreen\]\h:\[$BYellow\]\w\[$BCyan\]\$(__git_ps1)"
+    export PS1="\[$BBlue\]\u@\[$BGreen\]\h:\[$BYellow\]\w\[$BCyan\] \$(__git_ps1)"
 
     # On mac, change the default wifi login screen application so that it opens in the regular browser
     CAPTIVE_PORTAL_ACTIVE=$(defaults read /Library/Preferences/SystemConfiguration/com.apple.captive.control Active)
@@ -187,6 +187,30 @@ if [[ $mac = true ]]; then
     if [[ $? -eq 0 ]]; then
         ssh-add -k
     fi
+    # Check if brew is installed
+    which brew > /dev/null
+    if [[ $? = 0 ]]; then
+        # Since brew is installed, check for a few things that we like to use
+        # such as bash completion
+
+        brew_path=$(brew --prefix)
+
+        bash_completion=$brew_path/etc/bash_completion
+        if [[ ! -f $bash_completion ]]; then
+            cprint "Couldn't find bash_completion script --> Installing it now..."
+            brew install bash-completion
+        fi
+        cprint "Loading $bash_completion"
+      . $bash_completion
+    fi
+
+    # Get the git completion
+    git_completion=/Library/Developer/CommandLineTools/usr/share/git-core/git-completion.bash
+    if [[ ! -f $git_completion ]]; then
+        cprint "Couldn't find git_completion script $git_completion"
+    fi
+    cprint "Loading $git_completion"
+  . $git_completion
 fi
 
 if [[ $linux = true ]]; then
@@ -215,30 +239,6 @@ fi
 PS1+="\[$BPurple\] [\t]"
 
 PS1+="\$(RET=\$?; if [[ \$RET != 0 ]]; then echo -n \"\[$BRed\] $FancyX \"; else echo -n \"\[$BGreen\] $Checkmark\"; fi)\[$Color_Off\]\r\n\\$ "
-
-# Check if brew is installed
-which brew > /dev/null
-if [[ $? = 0 ]]; then
-    # Since brew is installed, check for a few things that we like to use
-    # such as bash completion and git prompt completion
-
-    brew_path=$(brew --prefix)
-    git_prompt=$brew_path/etc/bash_completion.d/git-prompt.sh
-    if [[ ! -f $git_prompt ]]; then
-        cprint "Couldn't find bash-git-prompt script at $git_prompt --> Installing it now..."
-        brew install bash-git-prompt
-    fi
-    cprint "Loading $git_prompt"
-    . $git_prompt
-
-    bash_completion=$brew_path/etc/bash_completion
-    if [[ ! -f $bash_completion ]]; then
-        cprint "Couldn't find bash_completion script --> Installing it now..."
-        brew install bash-completion
-    fi
-    cprint "Loading $bash_completion"
-  . $bash_completion
-fi
 
 # If the environment doesn't already have the __git_ps1 alias set up, then explicitly set it
 type __git_ps1 &> /dev/null
