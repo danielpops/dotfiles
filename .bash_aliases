@@ -90,6 +90,8 @@ if [ $linux = true ]; then
     alias tf='$(git rev-parse --show-cdup)bin/terraform'
 fi
 
+alias watch="watch --color"
+
 alias mco="inv"
 
 alias dev="ssh -A -R 33733:localhost:22 dev21-uswest1cdevc -t 'agenttmux a -t everything'"
