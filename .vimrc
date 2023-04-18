@@ -1,3 +1,6 @@
+" Set the colorscheme to something not terrible
+colorscheme default
+
 " Use Vim settings and not vi settings
 set nocompatible
 
@@ -271,3 +274,4 @@ com! JSON %!python -m json.tool
 
 " Easily toggle spelling
 command Spell setlocal spell! spelllang=en_us
+
