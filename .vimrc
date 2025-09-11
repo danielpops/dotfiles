@@ -250,7 +250,7 @@ set wildignore=*.o,*.pyc
 nmap <silent> <leader>w :set nolist!<CR>
 
 " Try to eliminate dependency on <Esc> key
-imap jj <Esc>
+"imap jj <Esc>
 
 " Vi-style editing in the command-line (kind of annoying)
 "nnoremap : q:a

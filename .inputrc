@@ -4,7 +4,7 @@ set editing-mode vi
 "\e[1;5C": forward-word
 
 # Like imap jj <Esc>
-"jj": "\e"
+#"jj": "\e"
 
 #"\e????": beginning-of-line
 #"\e????": end-of-line
