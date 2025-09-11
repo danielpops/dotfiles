@@ -158,6 +158,7 @@ if [[ -f ~/.bash_aliases ]]; then
 fi
 
 if [[ $mac = true ]]; then
+    export PATH="$(brew --prefix)/bin:$PATH"
 
     # Disable the "zomg you should use zsh" nag message
     export BASH_SILENCE_DEPRECATION_WARNING=1
