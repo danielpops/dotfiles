@@ -186,6 +186,9 @@ if [[ $mac = true ]]; then
         defaults write com.apple.Finder AppleShowAllFiles -bool true
     fi
 
+    # Configure scroll direction for my preference
+    defaults write -g com.apple.swipescrolldirection -bool NO
+
     # Better / actually usable key repeat values. These don't really need to be in bashrc and they
     # require a logout + login to take effect, but putting these here for my own reference in the future
     # https://apple.stackexchange.com/a/83923/174038
