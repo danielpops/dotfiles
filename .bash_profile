@@ -8,11 +8,18 @@ cprint() {
 }
 
 cprint "Loading ~/.bash_profile"
+cprint "Bash version: $(echo $BASH_VERSION)"
 
 # If the ~/.bashrc file exists, then load it
 if [ -f ~/.bashrc ]; then
-   # sourcing .bashrc was causing terminal to hang on osx catalina
-   # exec bash seemed to achieve the desired behavior without hanging
-   #source ~/.bashrc
-   exec bash
+    # sourcing .bashrc was causing terminal to hang on osx catalina
+    # exec bash seemed to achieve the desired behavior without hanging
+    #source ~/.bashrc
+    # Check if brew is installed
+    which brew > /dev/null
+    if [[ $? = 0 ]]; then
+        exec $(brew --prefix)/bin/bash
+    else
+        exec bash
+    fi
 fi

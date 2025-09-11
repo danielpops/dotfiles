@@ -8,6 +8,7 @@ cprint() {
         echo $*
     fi
 }
+cprint "Bash version: $(echo $BASH_VERSION)"
 
 # Also only download tools and such if it is an interactive shell (e.g. a real human logging in)
 # Otherwise, some automated tasks may end up taking longer than they should
@@ -158,8 +159,6 @@ if [[ -f ~/.bash_aliases ]]; then
 fi
 
 if [[ $mac = true ]]; then
-    export PATH="$(brew --prefix)/bin:$PATH"
-
     # Disable the "zomg you should use zsh" nag message
     export BASH_SILENCE_DEPRECATION_WARNING=1
 
@@ -214,7 +213,9 @@ if [[ $mac = true ]]; then
             brew install bash-completion
         fi
         cprint "Loading $bash_completion"
-      . $bash_completion
+        . $bash_completion
+        cprint "Adding ${brew_path}/bin to PATH"
+        export PATH="${brew_path}/bin:$PATH"
     fi
 
     # Get the git completion
