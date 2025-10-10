@@ -19,7 +19,7 @@ if [ -f ~/.bashrc ]; then
     which brew > /dev/null
     if [[ $? = 0 ]]; then
         exec $(brew --prefix)/bin/bash
-    else
-        exec bash
+    #else
+    #    exec bash
     fi
 fi
