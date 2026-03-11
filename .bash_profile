@@ -19,7 +19,9 @@ if [ -f ~/.bashrc ]; then
     which brew > /dev/null
     if [[ $? = 0 ]]; then
         exec $(brew --prefix)/bin/bash
-    #else
-    #    exec bash
+    else
+        if [[ -z "$CLAUDECODE" ]]; then
+            exec bash
+        fi
     fi
 fi
