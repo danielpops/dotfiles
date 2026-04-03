@@ -39,3 +39,12 @@ fi
 echo "Linking ~/$karabiner_json to $(pwd)/$karabiner_json ..."
 mkdir -p ~/.config/karabiner 2> /dev/null
 ln -s -f $(pwd)/$karabiner_json ~/$karabiner_json
+
+# cmux - tmux Claude Code workspace manager
+echo "Linking ~/.tmux/cmux to $(pwd)/.tmux/cmux ..."
+mkdir -p ~/.tmux 2> /dev/null
+if [ -d ~/.tmux/cmux ] && [ ! -h ~/.tmux/cmux ]; then
+    echo "Directory ~/.tmux/cmux exists... Renaming it!"
+    mv ~/.tmux/cmux ~/.tmux/cmux.bak
+fi
+ln -s -f -n $(pwd)/.tmux/cmux ~/.tmux/cmux

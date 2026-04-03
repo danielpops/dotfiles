@@ -269,7 +269,7 @@ set guifont=Menlo\ Regular:h18
 let g:terraform_align=1
 
 " Give a shortcut for formatting valid json inside vim
-com! JSON %!python -m json.tool
+com! JSON %!python3 -m json.tool
 
 
 " Easily toggle spelling
