@@ -527,8 +527,36 @@ cmd_pick() {
   done
 }
 
+cmd_prompt_new() {
+  printf "  Workspace name: "
+  local name="" char
+  while IFS= read -rsn1 char; do
+    # Escape key
+    if [ "$char" = $'\x1b' ]; then
+      exit 0
+    fi
+    # Enter
+    if [ "$char" = "" ]; then
+      echo
+      cmd_new "$name"
+      return
+    fi
+    # Backspace
+    if [ "$char" = $'\x7f' ] || [ "$char" = $'\b' ]; then
+      if [ -n "$name" ]; then
+        name="${name%?}"
+        printf '\b \b'
+      fi
+      continue
+    fi
+    name="${name}${char}"
+    printf '%s' "$char"
+  done
+}
+
 case "${1:-}" in
-  new)       shift; cmd_new "$@" ;;
+  new)        shift; cmd_new "$@" ;;
+  prompt-new) cmd_prompt_new ;;
   list|ls)   cmd_list ;;
   pick)      shift; cmd_pick "$@" ;;
   send)      shift; cmd_send "$@" ;;
