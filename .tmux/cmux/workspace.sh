@@ -6,21 +6,17 @@ CLAUDE_CMD="claude"
 OS="$(uname -s)"
 
 
-cmd_new() {
-  local name="$1"
+# _launch_workspace: creates the tmux window, tags it, launches claude
+# Args: name (for --name flag, can be empty), dir (working directory)
+_launch_workspace() {
+  local name="$1" dir="$2"
 
-  if [ -n "$name" ]; then
-    local dir="$HOME/claude/${name}"
-    mkdir -p "$dir"
-    tmux new-window -n "$name" -c "$dir"
-  else
-    tmux new-window -n "claude" -c "$HOME"
-  fi
+  mkdir -p "$dir"
+  tmux new-window -n "${name:-claude}" -c "$dir"
 
   local win_id
   win_id=$(tmux display-message -p '#{window_id}')
 
-  # Tag this window as a claude workspace and lock the name
   tmux set-option -w -t "$win_id" @cmux 1
   tmux set-option -w -t "$win_id" automatic-rename off
   tmux set-option -w -t "$win_id" allow-rename off
@@ -32,6 +28,41 @@ cmd_new() {
   else
     tmux send-keys -t "$win_id" "$CLAUDE_CMD" Enter
   fi
+}
+
+cmd_new() {
+  local input="$1"
+
+  if [ -z "$input" ]; then
+    _launch_workspace "" "$HOME"
+    return
+  fi
+
+  # If input looks like a path (contains /), use it as the directory
+  if [[ "$input" == */* ]]; then
+    # Expand ~ if present
+    local dir="${input/#\~/$HOME}"
+    dir=$(cd "$dir" 2>/dev/null && pwd || echo "$dir")
+    local name
+    name=$(basename "$dir")
+    mkdir -p "$dir"
+    _launch_workspace "$name" "$dir"
+    return
+  fi
+
+  # Plain name — use dated subfolder under ~/claude/
+  local date_prefix
+  date_prefix=$(date +%Y%m%d)
+  local dir="$HOME/claude/${date_prefix}_${input}"
+  if [ -d "$dir" ]; then
+    local seq=2
+    while [ -d "${dir}_${seq}" ]; do
+      seq=$((seq + 1))
+    done
+    dir="${dir}_${seq}"
+  fi
+  mkdir -p "$dir"
+  _launch_workspace "$input" "$dir"
 }
 
 cmd_list() {
@@ -528,20 +559,67 @@ cmd_pick() {
 }
 
 cmd_prompt_new() {
-  printf "  Workspace name: "
+  printf "  Workspace name or path: "
   local name="" char
   while IFS= read -rsn1 char; do
-    # Escape key
     if [ "$char" = $'\x1b' ]; then
       exit 0
     fi
-    # Enter
     if [ "$char" = "" ]; then
       echo
+
+      # Empty name — launch unnamed
+      if [ -z "$name" ]; then
+        cmd_new ""
+        return
+      fi
+
+      # If it's a path, just use it directly
+      if [[ "$name" == */* ]]; then
+        cmd_new "$name"
+        return
+      fi
+
+      # Check for existing folders matching this name under ~/claude/
+      local matches=()
+      while IFS= read -r d; do
+        matches+=("$d")
+      done < <(find "$HOME/claude" -maxdepth 1 -type d -name "*_${name}" 2>/dev/null | sort -r)
+
+      if [ ${#matches[@]} -gt 0 ]; then
+        echo ""
+        echo "  Existing workspaces found:"
+        local i=1
+        for m in "${matches[@]}"; do
+          echo "    $i) $(basename "$m")"
+          i=$((i + 1))
+        done
+        echo "    n) Create new"
+        echo "    Esc) Cancel"
+        echo ""
+        printf "  Choice: "
+        local choice=""
+        while IFS= read -rsn1 char; do
+          if [ "$char" = $'\x1b' ]; then exit 0; fi
+          if [ "$char" = "" ]; then echo; break; fi
+          if [ "$char" = $'\x7f' ] || [ "$char" = $'\b' ]; then
+            if [ -n "$choice" ]; then choice="${choice%?}"; printf '\b \b'; fi
+            continue
+          fi
+          choice="${choice}${char}"
+          printf '%s' "$char"
+        done
+        if [ "$choice" != "n" ] && [ "$choice" -ge 1 ] 2>/dev/null && [ "$choice" -le ${#matches[@]} ] 2>/dev/null; then
+          local idx=$((choice - 1))
+          _launch_workspace "$name" "${matches[$idx]}"
+          return
+        fi
+      fi
+
+      # Create new dated workspace
       cmd_new "$name"
       return
     fi
-    # Backspace
     if [ "$char" = $'\x7f' ] || [ "$char" = $'\b' ]; then
       if [ -n "$name" ]; then
         name="${name%?}"
