@@ -31,7 +31,7 @@ EOF
 start_watcher() {
   if [ -f "$PIDFILE" ] && kill -0 "$(cat "$PIDFILE")" 2>/dev/null; then
     echo "Watcher already running (PID $(cat "$PIDFILE"))"
-    return 1
+    return 0
   fi
   echo "Starting Claude Code watcher..."
   _run_watcher &
