@@ -559,77 +559,90 @@ cmd_pick() {
 }
 
 cmd_prompt_new() {
-  printf "  Workspace name or path: "
-  local name="" char
-  while IFS= read -rsn1 char; do
-    if [ "$char" = $'\x1b' ]; then
-      exit 0
-    fi
-    if [ "$char" = "" ]; then
-      echo
+  local SCRIPT_DIR
+  SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+  local FZF_SOURCE="${SCRIPT_DIR}/fzf-source.sh"
+  local CLAUDE_DIR="$HOME/claude"
 
-      # Empty name — launch unnamed
-      if [ -z "$name" ]; then
-        cmd_new ""
-        return
+  # Build initial candidate list (existing workspaces, most recent first)
+  local initial_list=""
+  if [ -d "$CLAUDE_DIR" ]; then
+    initial_list=$(ls -1dt "$CLAUDE_DIR"/*/ 2>/dev/null | while read -r d; do basename "$d"; done)
+  fi
+
+  # Run fzf with dynamic reload for path completion
+  local result
+  result=$(echo "$initial_list" | fzf \
+    --print-query \
+    --header='Type name (fuzzy match) or path (/ ~ ./ for dirs) | Esc to cancel' \
+    --prompt='Workspace: ' \
+    --height=100% \
+    --layout=reverse \
+    --info=inline \
+    --bind "change:reload:$FZF_SOURCE {q}" \
+    --preview="
+      item={};
+      query={q};
+      if [ -n \"\$item\" ]; then
+        # Selected an item from the list
+        if [ -d \"$CLAUDE_DIR/\$item\" ]; then
+          echo \"Existing workspace: $CLAUDE_DIR/\$item\";
+          echo '';
+          ls -lt \"$CLAUDE_DIR/\$item\" 2>/dev/null | head -10;
+        elif [ -d \"\${item/#\\~/$HOME}\" ]; then
+          expanded=\"\${item/#\\~/$HOME}\";
+          echo \"Directory: \$expanded\";
+          echo '';
+          ls -lt \"\$expanded\" 2>/dev/null | head -10;
+        else
+          echo \"New workspace: $CLAUDE_DIR/\$(date +%Y%m%d)_\$item\";
+        fi;
+      elif [ -n \"\$query\" ]; then
+        if [[ \"\$query\" == /* || \"\$query\" == ~* || \"\$query\" == ./* ]]; then
+          expanded=\"\${query/#\\~/$HOME}\";
+          echo \"Path: \$expanded\";
+        else
+          echo \"New workspace: $CLAUDE_DIR/\$(date +%Y%m%d)_\$query\";
+        fi;
       fi
+    " \
+    --preview-window=right:40%:wrap \
+  ) || true
 
-      # If it's a path, just use it directly
-      if [[ "$name" == */* ]]; then
-        cmd_new "$name"
-        return
-      fi
+  # fzf --print-query outputs: line 1 = query, line 2 = selected item (if any)
+  local query selected
+  query=$(echo "$result" | sed -n '1p')
+  selected=$(echo "$result" | sed -n '2p')
 
-      # Check for existing folders matching this name under ~/claude/
-      local matches=()
-      while IFS= read -r d; do
-        matches+=("$d")
-      done < <(find "$HOME/claude" -maxdepth 1 -type d -name "*_${name}" 2>/dev/null | sort -r)
+  # Nothing entered and nothing selected — cancelled or empty
+  if [ -z "$query" ] && [ -z "$selected" ]; then
+    return
+  fi
 
-      if [ ${#matches[@]} -gt 0 ]; then
-        echo ""
-        echo "  Existing workspaces found:"
-        local i=1
-        for m in "${matches[@]}"; do
-          echo "    $i) $(basename "$m")"
-          i=$((i + 1))
-        done
-        echo "    n) Create new"
-        echo "    Esc) Cancel"
-        echo ""
-        printf "  Choice: "
-        local choice=""
-        while IFS= read -rsn1 char; do
-          if [ "$char" = $'\x1b' ]; then exit 0; fi
-          if [ "$char" = "" ]; then echo; break; fi
-          if [ "$char" = $'\x7f' ] || [ "$char" = $'\b' ]; then
-            if [ -n "$choice" ]; then choice="${choice%?}"; printf '\b \b'; fi
-            continue
-          fi
-          choice="${choice}${char}"
-          printf '%s' "$char"
-        done
-        if [ "$choice" != "n" ] && [ "$choice" -ge 1 ] 2>/dev/null && [ "$choice" -le ${#matches[@]} ] 2>/dev/null; then
-          local idx=$((choice - 1))
-          _launch_workspace "$name" "${matches[$idx]}"
-          return
-        fi
-      fi
+  # Determine what to launch
+  local input="${selected:-$query}"
 
-      # Create new dated workspace
-      cmd_new "$name"
-      return
-    fi
-    if [ "$char" = $'\x7f' ] || [ "$char" = $'\b' ]; then
-      if [ -n "$name" ]; then
-        name="${name%?}"
-        printf '\b \b'
-      fi
-      continue
-    fi
-    name="${name}${char}"
-    printf '%s' "$char"
-  done
+  # If selected item is an existing workspace dir name
+  if [ -n "$selected" ] && [ -d "$CLAUDE_DIR/$selected" ]; then
+    local name
+    name=$(echo "$selected" | sed 's/^[0-9]*_//')
+    _launch_workspace "$name" "$CLAUDE_DIR/$selected"
+    return
+  fi
+
+  # If it's a path (selected from dir listing or typed)
+  if [[ "$input" == /* || "$input" == ~* || "$input" == ./* || "$input" == ../* ]]; then
+    local dir="${input/#\~/$HOME}"
+    dir=$(cd "$dir" 2>/dev/null && pwd || echo "$dir")
+    local name
+    name=$(basename "$dir")
+    mkdir -p "$dir"
+    _launch_workspace "$name" "$dir"
+    return
+  fi
+
+  # Plain name — delegate to cmd_new which handles dated subfolder creation
+  cmd_new "$input"
 }
 
 case "${1:-}" in
