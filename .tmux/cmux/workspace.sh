@@ -36,7 +36,7 @@ cmd_new() {
   local input="$1"
 
   if [ -z "$input" ]; then
-    _launch_workspace "" "$HOME"
+    _launch_workspace "" "$HOME/claude"
     return
   fi
 
