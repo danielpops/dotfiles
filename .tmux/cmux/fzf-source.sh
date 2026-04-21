@@ -30,6 +30,7 @@ if [[ "$query" == /* || "$query" == ~* || "$query" == ./* || "$query" == ../* ]]
 fi
 
 # Default: list existing workspaces from ~/claude/
+echo "+ New session"
 if [ -d "$CLAUDE_DIR" ]; then
   # Show most recent first
   ls -1dt "$CLAUDE_DIR"/*/ 2>/dev/null | while read -r d; do

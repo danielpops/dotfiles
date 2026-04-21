@@ -7,9 +7,9 @@ OS="$(uname -s)"
 
 
 # _launch_workspace: creates the tmux window, tags it, launches claude
-# Args: name (for --name flag, can be empty), dir (working directory)
+# Args: name (for --name flag, can be empty), dir (working directory), resume (if "resume", use --resume)
 _launch_workspace() {
-  local name="$1" dir="$2"
+  local name="$1" dir="$2" mode="${3:-}"
 
   mkdir -p "$dir"
   tmux new-window -n "${name:-claude}" -c "$dir"
@@ -23,7 +23,9 @@ _launch_workspace() {
   tmux set-option -w -t "$win_id" window-status-style 'fg=colour156,bg=colour236'
   tmux set-option -w -t "$win_id" window-status-current-style 'fg=colour156,bg=cyan,bold'
 
-  if [ -n "$name" ]; then
+  if [ "$mode" = "resume" ]; then
+    tmux send-keys -t "$win_id" "$CLAUDE_CMD --resume" Enter
+  elif [ -n "$name" ]; then
     tmux send-keys -t "$win_id" "$CLAUDE_CMD --name '$name'" Enter
   else
     tmux send-keys -t "$win_id" "$CLAUDE_CMD" Enter
@@ -565,9 +567,9 @@ cmd_prompt_new() {
   local CLAUDE_DIR="$HOME/claude"
 
   # Build initial candidate list (existing workspaces, most recent first)
-  local initial_list=""
+  local initial_list="+ New session"
   if [ -d "$CLAUDE_DIR" ]; then
-    initial_list=$(ls -1dt "$CLAUDE_DIR"/*/ 2>/dev/null | while read -r d; do basename "$d"; done)
+    initial_list=$(printf '%s\n' "$initial_list"; ls -1dt "$CLAUDE_DIR"/*/ 2>/dev/null | while read -r d; do basename "$d"; done)
   fi
 
   # Run fzf with dynamic reload for path completion
@@ -583,7 +585,9 @@ cmd_prompt_new() {
     --preview="
       item={};
       query={q};
-      if [ -n \"\$item\" ]; then
+      if [ \"\$item\" = '+ New session' ]; then
+        echo 'Launch unnamed Claude session in ~/';
+      elif [ -n \"\$item\" ]; then
         # Selected an item from the list
         if [ -d \"$CLAUDE_DIR/\$item\" ]; then
           echo \"Existing workspace: $CLAUDE_DIR/\$item\";
@@ -619,14 +623,20 @@ cmd_prompt_new() {
     return
   fi
 
+  # "+ New session" selected or empty query with it highlighted → unnamed session
+  if [ "$selected" = "+ New session" ] && [ -z "$query" ]; then
+    cmd_new ""
+    return
+  fi
+
   # Determine what to launch
   local input="${selected:-$query}"
 
-  # If selected item is an existing workspace dir name
+  # If selected item is an existing workspace dir name — resume session
   if [ -n "$selected" ] && [ -d "$CLAUDE_DIR/$selected" ]; then
     local name
     name=$(echo "$selected" | sed 's/^[0-9]*_//')
-    _launch_workspace "$name" "$CLAUDE_DIR/$selected"
+    _launch_workspace "$name" "$CLAUDE_DIR/$selected" resume
     return
   fi
 
