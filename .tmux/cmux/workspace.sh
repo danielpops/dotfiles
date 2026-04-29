@@ -23,7 +23,9 @@ _launch_workspace() {
   tmux set-option -w -t "$win_id" window-status-style 'fg=colour156,bg=colour236'
   tmux set-option -w -t "$win_id" window-status-current-style 'fg=colour156,bg=cyan,bold'
 
-  if [ "$mode" = "resume" ]; then
+  if [ "$mode" = "resume" ] && [ -n "$name" ]; then
+    tmux send-keys -t "$win_id" "$CLAUDE_CMD --resume '$name'" Enter
+  elif [ "$mode" = "resume" ]; then
     tmux send-keys -t "$win_id" "$CLAUDE_CMD --resume" Enter
   elif [ -n "$name" ]; then
     tmux send-keys -t "$win_id" "$CLAUDE_CMD --name '$name'" Enter
@@ -144,6 +146,114 @@ cmd_kill() {
   echo "Killed workspace $window"
 }
 
+cmd_refresh() {
+  local pane_id="$1"
+  [ -z "$pane_id" ] && { echo "Usage: workspace.sh refresh <pane_id>"; return 1; }
+
+  local pane_pid
+  pane_pid=$(tmux display-message -t "$pane_id" -p '#{pane_pid}' 2>/dev/null)
+  [ -z "$pane_pid" ] && { echo "Could not find pane $pane_id"; return 1; }
+
+  # Find the claude process that's a child of the pane's shell
+  local claude_pid=""
+  local claude_args=""
+  while IFS= read -r child_pid; do
+    local comm
+    comm=$(ps -p "$child_pid" -o comm= 2>/dev/null)
+    if echo "$comm" | grep -q claude; then
+      claude_pid="$child_pid"
+      claude_args=$(ps -p "$child_pid" -o args= 2>/dev/null)
+      break
+    fi
+  done < <(ps -eo pid,ppid 2>/dev/null | awk -v ppid="$pane_pid" '$2 == ppid {print $1}')
+
+  if [ -z "$claude_pid" ]; then
+    echo "No claude process found in pane $pane_id"
+    return 1
+  fi
+
+  # Extract session identifier from args
+  local resume_arg=""
+  if [[ "$claude_args" =~ --resume[[:space:]]+([^[:space:]]+) ]]; then
+    resume_arg="${BASH_REMATCH[1]}"
+  elif [[ "$claude_args" =~ --session-id[[:space:]]+([^[:space:]]+) ]]; then
+    resume_arg="${BASH_REMATCH[1]}"
+  elif [[ "$claude_args" =~ --name[[:space:]]+\'([^\']+)\' ]]; then
+    resume_arg="${BASH_REMATCH[1]}"
+  elif [[ "$claude_args" =~ --name[[:space:]]+([^[:space:]]+) ]]; then
+    resume_arg="${BASH_REMATCH[1]}"
+  fi
+
+  # Kill the claude process tree, keep the shell
+  kill -TERM "$claude_pid" 2>/dev/null
+  sleep 1
+  kill -0 "$claude_pid" 2>/dev/null && kill -9 "$claude_pid" 2>/dev/null
+  sleep 1
+
+  if [ -n "$resume_arg" ]; then
+    tmux send-keys -t "$pane_id" "$CLAUDE_CMD --resume '$resume_arg'" Enter
+  else
+    tmux send-keys -t "$pane_id" "$CLAUDE_CMD --resume" Enter
+  fi
+}
+
+cmd_refresh_pick() {
+  local current_pane="${1:-}"
+
+  # Reuse the pane collection/picker from cmd_pick but for refresh
+  local -a pane_ids=()
+  local -a pane_labels=()
+  local -a pane_cwds=()
+
+  while IFS= read -r line; do
+    local pane_id win_idx win_name pane_idx pane_pid pane_cwd
+    pane_id=$(echo "$line" | cut -d'|' -f1)
+    win_idx=$(echo "$line" | cut -d'|' -f2)
+    win_name=$(echo "$line" | cut -d'|' -f3)
+    pane_idx=$(echo "$line" | cut -d'|' -f4)
+    pane_pid=$(echo "$line" | cut -d'|' -f5)
+    pane_cwd=$(echo "$line" | cut -d'|' -f6)
+
+    [ "$win_name" = "[tmux]" ] && win_name=$(basename "$pane_cwd")
+    ps -eo ppid,comm 2>/dev/null | grep -q "^ *${pane_pid} .*claude" || continue
+
+    pane_ids+=("$pane_id")
+    pane_labels+=("${win_idx}:${pane_idx} ${win_name}")
+    pane_cwds+=("${pane_cwd/#$HOME/\~}")
+  done < <(tmux list-panes -a -F '#{pane_id}|#{window_index}|#{window_name}|#{pane_index}|#{pane_pid}|#{pane_current_path}' 2>/dev/null)
+
+  local count=${#pane_ids[@]}
+  if [ "$count" -eq 0 ]; then
+    echo "No Claude panes found."
+    read -rsn1 -p "Press any key to close..."
+    return
+  fi
+
+  # Build fzf list
+  local fzf_input=""
+  for i in $(seq 0 $((count - 1))); do
+    fzf_input+="${pane_ids[$i]}|${pane_labels[$i]}|${pane_cwds[$i]}"$'\n'
+  done
+
+  local selected
+  selected=$(echo "$fzf_input" | fzf \
+    --header='Select pane to refresh (restart claude with latest version)' \
+    --prompt='Refresh: ' \
+    --height=100% \
+    --layout=reverse \
+    --delimiter='|' \
+    --with-nth=2,3 \
+  ) || return
+
+  local target_pane
+  target_pane=$(echo "$selected" | cut -d'|' -f1)
+  local target_label
+  target_label=$(echo "$selected" | cut -d'|' -f2)
+
+  echo "Refreshing: ${target_label}..."
+  cmd_refresh "$target_pane"
+}
+
 cmd_focus() {
   local window="$1"
   [ -z "$window" ] && { echo "Usage: workspace.sh focus <window>"; return 1; }
@@ -181,8 +291,8 @@ EOF
 cmd_menu() {
   local current_pane="${1:-}"
 
-  local -a actions=("New workspace" "Switch to pane" "Send to pane" "Read pane output" "Kill workspace" "Split workspace")
-  local -a action_keys=("new" "pick" "send" "read" "kill" "split")
+  local -a actions=("New workspace" "Switch to pane" "Send to pane" "Read pane output" "Refresh workspace" "Kill workspace" "Split workspace")
+  local -a action_keys=("new" "pick" "send" "read" "refresh" "kill" "split")
   local action_count=${#actions[@]}
   local selected=0
 
@@ -371,6 +481,24 @@ cmd_menu() {
             if [ -n "$pane_selected" ]; then
               tput cnorm 2>/dev/null
               tmux capture-pane -t "$pane_selected" -p -S -100 | less
+              return
+            fi
+            ;;
+          refresh)
+            local pane_selected="" pane_selected_label=""
+            _pick_pane "Refresh Claude (select pane)"
+            if [ -n "$pane_selected" ]; then
+              tput cnorm 2>/dev/null
+              clear
+              echo "  Refresh: ${pane_selected_label}"
+              echo "  This will restart claude with the latest version."
+              echo ""
+              read -p "  Confirm (y/N): " confirm
+              if [ "$confirm" = "y" ] || [ "$confirm" = "Y" ]; then
+                cmd_refresh "$pane_selected"
+                echo "  Refreshed."
+                sleep 1
+              fi
               return
             fi
             ;;
@@ -664,6 +792,8 @@ case "${1:-}" in
   send-key)  shift; cmd_send_key "$@" ;;
   read)      shift; cmd_read "$@" ;;
   kill)      shift; cmd_kill "$@" ;;
+  refresh)   shift; cmd_refresh "$@" ;;
+  refresh-pick) shift; cmd_refresh_pick "$@" ;;
   focus)     shift; cmd_focus "$@" ;;
   split)     shift; cmd_split "$@" ;;
   notify)    shift; cmd_notify "$@" ;;
