@@ -38,7 +38,16 @@ cmd_new() {
   local input="$1"
 
   if [ -z "$input" ]; then
-    _launch_workspace "" "$HOME/claude"
+    local date_prefix
+    date_prefix=$(date +%Y%m%d)
+    local dir="$HOME/claude/${date_prefix}_unnamed_1"
+    local seq=2
+    while [ -d "$dir" ]; do
+      dir="$HOME/claude/${date_prefix}_unnamed_${seq}"
+      seq=$((seq + 1))
+    done
+    mkdir -p "$dir"
+    _launch_workspace "" "$dir"
     return
   fi
 
