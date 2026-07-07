@@ -131,7 +131,10 @@ cmd_send() {
   local window="$1"; shift
   local text="$*"
   [ -z "$window" ] || [ -z "$text" ] && { echo "Usage: workspace.sh send <window> <text>"; return 1; }
-  tmux send-keys -t ":${window}.0" "$text" Enter
+  local target=":${window}.0"
+  # Use bracketed paste to bypass vim-mode interpretation
+  tmux send-keys -t "$target" -l $'\e[200~'"${text}"$'\e[201~'
+  tmux send-keys -t "$target" Enter
 }
 
 cmd_send_key() {
@@ -479,7 +482,9 @@ cmd_menu() {
               echo ""
               read -p "  Text: " txt
               if [ -n "$txt" ]; then
-                tmux send-keys -t "$pane_selected" "$txt" Enter
+                # Use bracketed paste to bypass vim-mode interpretation
+                tmux send-keys -t "$pane_selected" -l $'\e[200~'"${txt}"$'\e[201~'
+                tmux send-keys -t "$pane_selected" Enter
               fi
               return
             fi
