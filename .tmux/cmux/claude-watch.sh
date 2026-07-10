@@ -3,6 +3,12 @@
 # Cross-platform: macOS (osascript notifications) and Linux (tmux-only)
 #
 # Usage: claude-watch.sh [start|stop|status]
+#
+# macOS notification style:
+#   osascript notifications are delivered under "Script Editor" in Notification
+#   Center. To make banners persist until dismissed instead of auto-hiding after
+#   ~5s, open System Settings > Notifications > Script Editor, and change the
+#   alert style from "Banners" to "Alerts".
 
 PIDFILE="/tmp/tmux-cmux-watcher.pid"
 POLL_INTERVAL=3
@@ -65,7 +71,11 @@ status_watcher() {
 }
 
 _run_watcher() {
-  # Track per-pane: content hash, whether content has changed, whether we notified
+  # Track per-pane:
+  #   pane_hash    — last content hash we saw
+  #   pane_changed — set to 1 the first time we see the hash actually change
+  #                  (guarantees we've observed at least one real working→idle transition)
+  #   notified     — set to 1 after we fire; cleared on next content change
   declare -A pane_hash
   declare -A pane_changed
   declare -A notified
@@ -94,14 +104,26 @@ _run_watcher() {
       local prev_hash="${pane_hash[$pane_id]:-}"
       pane_hash[$pane_id]="$content_hash"
 
+      # First time seeing this pane: seed baseline and mark as already-notified so
+      # panes that are ALREADY idle at watcher startup don't trigger a false alert.
+      # We only care about future busy→idle transitions.
+      if [ -z "$prev_hash" ]; then
+        notified[$pane_id]="1"
+        continue
+      fi
+
       if [ "$content_hash" != "$prev_hash" ]; then
-        # Content changed — Claude is working. Mark as changed and reset notification.
+        # Content actively changing → Claude is working. Clear notified so the next
+        # idle transition can fire, and mark that we've seen a real change.
         pane_changed[$pane_id]="1"
         notified[$pane_id]=""
-      elif [ -n "${pane_changed[$pane_id]}" ] && [ -z "${notified[$pane_id]}" ] && [ -n "$prev_hash" ]; then
-        # Content stable for 2 consecutive polls AND we haven't notified yet.
-        # Check if Claude is at its input prompt (idle).
-        if echo "$last_lines" | grep -qE -- '-- INSERT --|-- NORMAL --'; then
+      elif [ -n "${pane_changed[$pane_id]}" ] && [ -z "${notified[$pane_id]}" ]; then
+        # Content stable this poll AND we saw it change earlier AND we haven't
+        # notified for this idle transition yet. Check for any idle-input marker:
+        #   -- INSERT -- / -- NORMAL --   free-text prompt (default state)
+        #   Enter to select               interactive picker / question popup
+        #   Do you want to                permission/confirmation prompt
+        if echo "$last_lines" | grep -qE -- '-- INSERT --|-- NORMAL --|Enter to select|Do you want to'; then
           # Only notify if user is on a different window
           if [ "$active_win" != "$win_idx" ]; then
             notified[$pane_id]="1"
