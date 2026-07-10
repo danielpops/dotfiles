@@ -96,7 +96,7 @@ cmd_list() {
     while IFS= read -r pane_line; do
       local ppid
       ppid=$(echo "$pane_line" | cut -d'|' -f1)
-      if ps -eo ppid,comm 2>/dev/null | grep -q "^ *${ppid} .*claude"; then
+      if ps -u "$USER" -o ppid,comm 2>/dev/null | grep -q "^ *${ppid} .*claude"; then
         has_claude=true
         local pane_id_check
         pane_id_check=$(echo "$pane_line" | cut -d'|' -f2)
@@ -227,7 +227,7 @@ cmd_refresh_pick() {
     pane_cwd=$(echo "$line" | cut -d'|' -f6)
 
     [ "$win_name" = "[tmux]" ] && win_name=$(basename "$pane_cwd")
-    ps -eo ppid,comm 2>/dev/null | grep -q "^ *${pane_pid} .*claude" || continue
+    ps -u "$USER" -o ppid,comm 2>/dev/null | grep -q "^ *${pane_pid} .*claude" || continue
 
     pane_ids+=("$pane_id")
     pane_labels+=("${win_idx}:${pane_idx} ${win_name}")
@@ -342,7 +342,7 @@ cmd_menu() {
 
       [ "$wn" = "[tmux]" ] && wn=$(basename "$pcwd")
 
-      ps -eo ppid,comm 2>/dev/null | grep -q "^ *${ppid} .*claude" || continue
+      ps -u "$USER" -o ppid,comm 2>/dev/null | grep -q "^ *${ppid} .*claude" || continue
 
       local status="active"
       local ll
@@ -596,7 +596,7 @@ cmd_pick() {
     fi
 
     # Check if this pane is running claude
-    if ! ps -eo ppid,comm 2>/dev/null | grep -q "^ *${pane_pid} .*claude"; then
+    if ! ps -u "$USER" -o ppid,comm 2>/dev/null | grep -q "^ *${pane_pid} .*claude"; then
       continue
     fi
 

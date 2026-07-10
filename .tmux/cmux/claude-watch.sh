@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # claude-watch.sh - Monitor Claude Code panes for when they finish working
-# Cross-platform: macOS (osascript notifications) and Linux (tmux-only)
+# Cross-platform: macOS (osascript notifications) and Linux (iTerm2 OSC 9 via SSH).
 #
 # Usage: claude-watch.sh [start|stop|status]
 #
@@ -9,10 +9,21 @@
 #   Center. To make banners persist until dismissed instead of auto-hiding after
 #   ~5s, open System Settings > Notifications > Script Editor, and change the
 #   alert style from "Banners" to "Alerts".
+#
+# Remote-Linux notifications:
+#   When running on Linux, the watcher writes an iTerm2 OSC 9 escape sequence
+#   directly to each attached tmux client's tty. iTerm2 on the Mac end (over
+#   SSH) turns it into a real macOS Notification Center banner. Requires:
+#     - iTerm2 on the Mac (with default "Show Bells in Notification Center"
+#       ON — Preferences > Profiles > Terminal > Notifications). OSC 9 uses
+#       the same subsystem.
+#     - No extra packages on the Linux box.
+#   If no client is attached, it falls back to just the tmux status message.
 
 PIDFILE="/tmp/tmux-cmux-watcher.pid"
 POLL_INTERVAL=3
 OS="$(uname -s)"
+HOSTNAME_SHORT="$(hostname -s 2>/dev/null || hostname 2>/dev/null)"
 
 _hash() {
   if command -v md5 >/dev/null 2>&1; then
@@ -24,13 +35,21 @@ _hash() {
 
 _notify() {
   local win_name="$1" win_idx="$2"
-  # tmux message (always)
+  # tmux status message (always)
   tmux display-message "Claude finished in [${win_name}] (window #${win_idx})" 2>/dev/null
-  # macOS notification
   if [ "$OS" = "Darwin" ]; then
+    # Local Mac — use Notification Center via osascript
     osascript <<EOF 2>/dev/null
 display notification "Claude finished in ${win_name}" with title "cmux" subtitle "Window #${win_idx}"
 EOF
+  else
+    # Remote host — send iTerm2 OSC 9 to each attached client's tty. iTerm2
+    # converts it into a macOS Notification Center banner on the Mac end.
+    # Format: ESC ] 9 ; <message> BEL
+    local msg="cmux@${HOSTNAME_SHORT}: Claude finished in ${win_name} (window #${win_idx})"
+    while IFS= read -r tty; do
+      [ -n "$tty" ] && [ -w "$tty" ] && printf '\033]9;%s\007' "$msg" > "$tty" 2>/dev/null
+    done < <(tmux list-clients -F '#{client_tty}' 2>/dev/null)
   fi
 }
 
@@ -90,8 +109,9 @@ _run_watcher() {
       win_idx=$(echo "$line" | cut -d'|' -f2)
       pane_pid=$(echo "$line" | cut -d'|' -f3)
 
-      # Only watch panes running claude
-      if ! ps -eo ppid,comm 2>/dev/null | grep -q "^ *${pane_pid} .*claude"; then
+      # Only watch panes running claude — restrict to processes owned by $USER
+      # so a shared/multi-tenant host doesn't cross-notify on other users' shells.
+      if ! ps -u "$USER" -o ppid,comm 2>/dev/null | grep -q "^ *${pane_pid} .*claude"; then
         unset "pane_hash[$pane_id]" "pane_changed[$pane_id]" "notified[$pane_id]"
         continue
       fi
