@@ -2,40 +2,45 @@
 # workspace.sh - Manage Claude Code workspaces in tmux
 # Cross-platform: macOS and Linux
 
-CLAUDE_CMD="claude"
 OS="$(uname -s)"
 
+CMUX_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=agent.sh
+. "${CMUX_DIR}/agent.sh"
 
-# _launch_workspace: creates the tmux window, tags it, launches claude
-# Args: name (for --name flag, can be empty), dir (working directory), resume (if "resume", use --resume)
+# _launch_workspace: creates the tmux window, tags it, launches the agent
+# Args: name (for --name flag, can be empty), dir (working directory),
+#       mode ("resume" to resume), agent ("claude"|"pi", defaults to claude)
 _launch_workspace() {
-  local name="$1" dir="$2" mode="${3:-}"
+  local name="$1" dir="$2" mode="${3:-}" agent="${4:-$CMUX_DEFAULT_AGENT}"
+
+  cmux_agent_valid "$agent" || agent="$CMUX_DEFAULT_AGENT"
 
   mkdir -p "$dir"
-  tmux new-window -n "${name:-claude}" -c "$dir"
+  cmux_write_marker "$dir" "$agent"
+  tmux new-window -n "${name:-$agent}" -c "$dir"
 
   local win_id
   win_id=$(tmux display-message -p '#{window_id}')
 
   tmux set-option -w -t "$win_id" @cmux 1
+  tmux set-option -w -t "$win_id" @cmux_agent "$agent"
   tmux set-option -w -t "$win_id" automatic-rename off
   tmux set-option -w -t "$win_id" allow-rename off
-  tmux set-option -w -t "$win_id" window-status-style 'fg=colour156,bg=colour236'
-  tmux set-option -w -t "$win_id" window-status-current-style 'fg=colour156,bg=cyan,bold'
-
-  if [ "$mode" = "resume" ] && [ -n "$name" ]; then
-    tmux send-keys -t "$win_id" "$CLAUDE_CMD --resume '$name'" Enter
-  elif [ "$mode" = "resume" ]; then
-    tmux send-keys -t "$win_id" "$CLAUDE_CMD --resume" Enter
-  elif [ -n "$name" ]; then
-    tmux send-keys -t "$win_id" "$CLAUDE_CMD --name '$name'" Enter
+  # pi windows get a distinct tint so they're identifiable at a glance
+  if [ "$agent" = "pi" ]; then
+    tmux set-option -w -t "$win_id" window-status-style 'fg=colour215,bg=colour236'
+    tmux set-option -w -t "$win_id" window-status-current-style 'fg=colour235,bg=colour215,bold'
   else
-    tmux send-keys -t "$win_id" "$CLAUDE_CMD" Enter
+    tmux set-option -w -t "$win_id" window-status-style 'fg=colour156,bg=colour236'
+    tmux set-option -w -t "$win_id" window-status-current-style 'fg=colour156,bg=cyan,bold'
   fi
+
+  tmux send-keys -t "$win_id" "$(cmux_launch_cmd "$agent" "$mode" "$name")" Enter
 }
 
 cmd_new() {
-  local input="$1"
+  local input="$1" agent="${2:-$CMUX_DEFAULT_AGENT}"
 
   if [ -z "$input" ]; then
     local date_prefix
@@ -49,7 +54,7 @@ cmd_new() {
       seq=$((seq + 1))
     done
     mkdir -p "$dir"
-    _launch_workspace "$name" "$dir"
+    _launch_workspace "$name" "$dir" "" "$agent"
     return
   fi
 
@@ -61,7 +66,7 @@ cmd_new() {
     local name
     name=$(basename "$dir")
     mkdir -p "$dir"
-    _launch_workspace "$name" "$dir"
+    _launch_workspace "$name" "$dir" "" "$agent"
     return
   fi
 
@@ -77,13 +82,13 @@ cmd_new() {
     dir="${dir}_${seq}"
   fi
   mkdir -p "$dir"
-  _launch_workspace "$input" "$dir"
+  _launch_workspace "$input" "$dir" "" "$agent"
 }
 
 cmd_list() {
-  echo "Claude Workspaces:"
+  echo "Agent Workspaces:"
   echo "─────────────────────────────────────────────────────"
-  printf "%-4s %-20s %-30s %-10s\n" "Win" "Name" "Directory" "Status"
+  printf "%-4s %-6s %-20s %-30s %-10s\n" "Win" "Agent" "Name" "Directory" "Status"
   echo "─────────────────────────────────────────────────────"
 
   while IFS= read -r line; do
@@ -95,22 +100,15 @@ cmd_list() {
 
     local has_claude=false
     local status="idle"
+    local agent=""
     while IFS= read -r pane_line; do
       local ppid
       ppid=$(echo "$pane_line" | cut -d'|' -f1)
-      if ps -u "$USER" -o ppid,comm 2>/dev/null | grep -q "^ *${ppid} .*claude"; then
+      if agent=$(cmux_pane_agent "$ppid"); then
         has_claude=true
         local pane_id_check
         pane_id_check=$(echo "$pane_line" | cut -d'|' -f2)
-        local last_line
-        last_line=$(tmux capture-pane -t "$pane_id_check" -p -S -3 2>/dev/null | grep -v '^$' | tail -1)
-        if echo "$last_line" | grep -qE '⠋|⠙|⠹|⠸|⠼|⠴|⠦|⠧|⠇|⠏|Thinking|Reading|Writing|Running'; then
-          status="working"
-        elif echo "$last_line" | grep -qE '^\$|^\>|y/n|Y/n|approve|deny'; then
-          status="waiting"
-        else
-          status="active"
-        fi
+        status=$(cmux_pane_status "$pane_id_check")
         break
       fi
     done < <(tmux list-panes -t ":${win_idx}" -F '#{pane_pid}|#{pane_id}' 2>/dev/null)
@@ -124,7 +122,8 @@ cmd_list() {
         active)  status_color="\033[32m" ;;
         *)       status_color="\033[37m" ;;
       esac
-      printf "%-4s %-20s %-30s ${status_color}%-10s\033[0m\n" "$win_idx" "$win_name" "$short_cwd" "$status"
+      printf "%-4s %-6s %-20s %-30s ${status_color}%-10s\033[0m\n" \
+        "$win_idx" "$(cmux_agent_label "$agent")" "$win_name" "$short_cwd" "$status"
     fi
   done < <(tmux list-windows -F '#{window_index}|#{window_name}|#{pane_pid}|#{pane_current_path}' 2>/dev/null)
 }
@@ -168,47 +167,55 @@ cmd_refresh() {
   pane_pid=$(tmux display-message -t "$pane_id" -p '#{pane_pid}' 2>/dev/null)
   [ -z "$pane_pid" ] && { echo "Could not find pane $pane_id"; return 1; }
 
-  # Find the claude process that's a child of the pane's shell
-  local claude_pid=""
-  local claude_args=""
+  # Find the agent process that's a child of the pane's shell.
+  # Match on args, not comm — /opt/homebrew/bin/claude is a bash wrapper, so its
+  # comm is "/bin/bash" and a comm-based match never fires.
+  local agent_pid=""
+  local agent_args=""
+  local agent=""
   while IFS= read -r child_pid; do
-    local comm
-    comm=$(ps -p "$child_pid" -o comm= 2>/dev/null)
-    if echo "$comm" | grep -q claude; then
-      claude_pid="$child_pid"
-      claude_args=$(ps -p "$child_pid" -o args= 2>/dev/null)
-      break
+    local args
+    args=$(ps -p "$child_pid" -o args= 2>/dev/null)
+    if [[ "$args" =~ (^|/)claude([[:space:]]|$) ]]; then
+      agent="claude"
+    elif [[ "$args" =~ (^|/)pi([[:space:]]|$) ]]; then
+      agent="pi"
+    else
+      continue
     fi
+    agent_pid="$child_pid"
+    agent_args="$args"
+    break
   done < <(ps -eo pid,ppid 2>/dev/null | awk -v ppid="$pane_pid" '$2 == ppid {print $1}')
 
-  if [ -z "$claude_pid" ]; then
-    echo "No claude process found in pane $pane_id"
+  if [ -z "$agent_pid" ]; then
+    echo "No claude or pi process found in pane $pane_id"
     return 1
   fi
 
-  # Extract session identifier from args
+  # Extract session identifier from args (claude only — pi resumes via --continue)
   local resume_arg=""
-  if [[ "$claude_args" =~ --resume[[:space:]]+([^[:space:]]+) ]]; then
-    resume_arg="${BASH_REMATCH[1]}"
-  elif [[ "$claude_args" =~ --session-id[[:space:]]+([^[:space:]]+) ]]; then
-    resume_arg="${BASH_REMATCH[1]}"
-  elif [[ "$claude_args" =~ --name[[:space:]]+\'([^\']+)\' ]]; then
-    resume_arg="${BASH_REMATCH[1]}"
-  elif [[ "$claude_args" =~ --name[[:space:]]+([^[:space:]]+) ]]; then
-    resume_arg="${BASH_REMATCH[1]}"
+  if [ "$agent" = "claude" ]; then
+    if [[ "$agent_args" =~ --resume[[:space:]]+\'([^\']+)\' ]]; then
+      resume_arg="${BASH_REMATCH[1]}"
+    elif [[ "$agent_args" =~ --resume[[:space:]]+([^[:space:]-][^[:space:]]*) ]]; then
+      resume_arg="${BASH_REMATCH[1]}"
+    elif [[ "$agent_args" =~ --session-id[[:space:]]+([^[:space:]]+) ]]; then
+      resume_arg="${BASH_REMATCH[1]}"
+    elif [[ "$agent_args" =~ --name[[:space:]]+\'([^\']+)\' ]]; then
+      resume_arg="${BASH_REMATCH[1]}"
+    elif [[ "$agent_args" =~ --name[[:space:]]+([^[:space:]]+) ]]; then
+      resume_arg="${BASH_REMATCH[1]}"
+    fi
   fi
 
-  # Kill the claude process tree, keep the shell
-  kill -TERM "$claude_pid" 2>/dev/null
+  # Kill the agent process tree, keep the shell
+  kill -TERM "$agent_pid" 2>/dev/null
   sleep 1
-  kill -0 "$claude_pid" 2>/dev/null && kill -9 "$claude_pid" 2>/dev/null
+  kill -0 "$agent_pid" 2>/dev/null && kill -9 "$agent_pid" 2>/dev/null
   sleep 1
 
-  if [ -n "$resume_arg" ]; then
-    tmux send-keys -t "$pane_id" "$CLAUDE_CMD --resume '$resume_arg'" Enter
-  else
-    tmux send-keys -t "$pane_id" "$CLAUDE_CMD --resume" Enter
-  fi
+  tmux send-keys -t "$pane_id" "$(cmux_launch_cmd "$agent" resume "$resume_arg")" Enter
 }
 
 cmd_refresh_pick() {
@@ -229,16 +236,17 @@ cmd_refresh_pick() {
     pane_cwd=$(echo "$line" | cut -d'|' -f6)
 
     [ "$win_name" = "[tmux]" ] && win_name=$(basename "$pane_cwd")
-    ps -u "$USER" -o ppid,comm 2>/dev/null | grep -q "^ *${pane_pid} .*claude" || continue
+    local agent
+    agent=$(cmux_pane_agent "$pane_pid") || continue
 
     pane_ids+=("$pane_id")
-    pane_labels+=("${win_idx}:${pane_idx} ${win_name}")
+    pane_labels+=("${win_idx}:${pane_idx} [$(cmux_agent_label "$agent")] ${win_name}")
     pane_cwds+=("${pane_cwd/#$HOME/\~}")
   done < <(tmux list-panes -a -F '#{pane_id}|#{window_index}|#{window_name}|#{pane_index}|#{pane_pid}|#{pane_current_path}' 2>/dev/null)
 
   local count=${#pane_ids[@]}
   if [ "$count" -eq 0 ]; then
-    echo "No Claude panes found."
+    echo "No agent panes found."
     read -rsn1 -p "Press any key to close..."
     return
   fi
@@ -251,7 +259,7 @@ cmd_refresh_pick() {
 
   local selected
   selected=$(echo "$fzf_input" | fzf \
-    --header='Select pane to refresh (restart claude with latest version)' \
+    --header='Select pane to refresh (restart the agent with latest version)' \
     --prompt='Refresh: ' \
     --height=100% \
     --layout=reverse \
@@ -326,12 +334,13 @@ cmd_menu() {
     fi
   }
 
-  # Collect claude panes into arrays (reused by multiple actions)
+  # Collect agent panes into arrays (reused by multiple actions)
   _collect_panes() {
     pane_ids=()
     pane_labels=()
     pane_cwds=()
     pane_statuses=()
+    pane_agents=()
 
     while IFS= read -r line; do
       local pid wix wn pix ppid pcwd
@@ -344,34 +353,30 @@ cmd_menu() {
 
       [ "$wn" = "[tmux]" ] && wn=$(basename "$pcwd")
 
-      ps -u "$USER" -o ppid,comm 2>/dev/null | grep -q "^ *${ppid} .*claude" || continue
+      local agent
+      agent=$(cmux_pane_agent "$ppid") || continue
 
-      local status="active"
-      local ll
-      ll=$(tmux capture-pane -t "$pid" -p -S -3 2>/dev/null | grep -v '^$' | tail -1)
-      if echo "$ll" | grep -qE '⠋|⠙|⠹|⠸|⠼|⠴|⠦|⠧|⠇|⠏|Thinking|Reading|Writing|Running'; then
-        status="working"
-      elif echo "$ll" | grep -qE '^\$|^\>|y/n|Y/n|approve|deny'; then
-        status="waiting"
-      fi
+      local status
+      status=$(cmux_pane_status "$pid")
 
       pane_ids+=("$pid")
-      pane_labels+=("${wix}:${pix} ${wn}")
+      pane_labels+=("${wix}:${pix} [$(cmux_agent_label "$agent")] ${wn}")
       pane_cwds+=("${pcwd/#$HOME/~}")
       pane_statuses+=("$status")
+      pane_agents+=("$agent")
     done < <(tmux list-panes -a -F '#{pane_id}|#{window_index}|#{window_name}|#{pane_index}|#{pane_pid}|#{pane_current_path}' 2>/dev/null)
   }
 
   # Draw a pane list with selection highlight, returns via pane_selected
   _pick_pane() {
     local title="$1"
-    local -a pane_ids pane_labels pane_cwds pane_statuses
+    local -a pane_ids pane_labels pane_cwds pane_statuses pane_agents
     _collect_panes
 
     local pcount=${#pane_ids[@]}
     if [ "$pcount" -eq 0 ]; then
       clear
-      echo "  No Claude panes found."
+      echo "  No agent panes found."
       read -rsn1 -p "  Press any key..."
       pane_selected=""
       return
@@ -390,7 +395,7 @@ cmd_menu() {
       echo "  ${title}"
       echo "  ──────────────────────────────────────────────────────────────────────────"
       echo ""
-      printf "    %-12s %-22s %-38s %-10s\n" "Win:Pane" "Name" "Directory" "Status"
+      printf "    %-10s %-27s %-38s %-10s\n" "Win:Pane" "Name" "Directory" "Status"
       echo "    ────────────────────────────────────────────────────────────────────────"
       for i in $(seq 0 $((pcount - 1))); do
         local prefix="    " sc="" reset="\033[0m"
@@ -399,10 +404,10 @@ cmd_menu() {
         esac
         if [ "$i" -eq "$psel" ]; then
           prefix="  \033[7m>"
-          printf "${prefix} %-12s %-22s %-38s ${sc}%-10s${reset}\033[0m\n" \
+          printf "${prefix} %-10s %-27s %-38s ${sc}%-10s${reset}\033[0m\n" \
             "${pane_labels[$i]%% *}" "${pane_labels[$i]#* }" "${pane_cwds[$i]}" "${pane_statuses[$i]}"
         else
-          printf "${prefix} %-12s %-22s %-38s ${sc}%-10s${reset}\n" \
+          printf "${prefix} %-10s %-27s %-38s ${sc}%-10s${reset}\n" \
             "${pane_labels[$i]%% *}" "${pane_labels[$i]#* }" "${pane_cwds[$i]}" "${pane_statuses[$i]}"
         fi
       done
@@ -425,7 +430,7 @@ cmd_menu() {
 
   while true; do
     clear
-    echo "  Claude Code Workspace Manager"
+    echo "  Agent Workspace Manager (claude / pi)"
     echo "  ──────────────────────────────────────────────────────────────────────────"
     echo ""
     for i in $(seq 0 $((action_count - 1))); do
@@ -454,18 +459,24 @@ cmd_menu() {
           new)
             tput cnorm 2>/dev/null
             clear
-            echo "  New Claude Workspace"
-            echo "  ────────────────────"
+            echo "  New Agent Workspace"
+            echo "  ───────────────────"
             echo ""
             read -p "  Name: " name
             if [ -n "$name" ]; then
-              ~/.tmux/cmux/workspace.sh new "$name"
+              echo ""
+              read -p "  Agent [C]laude / [p]i: " agent_choice
+              local new_agent="claude"
+              case "$agent_choice" in
+                p|P|pi|PI) new_agent="pi" ;;
+              esac
+              ~/.tmux/cmux/workspace.sh new "$name" "$new_agent"
             fi
             return
             ;;
           pick)
             local pane_selected="" pane_selected_label=""
-            _pick_pane "Switch to Claude pane"
+            _pick_pane "Switch to agent pane"
             if [ -n "$pane_selected" ]; then
               tput cnorm 2>/dev/null
               tmux select-window -t "$pane_selected"
@@ -475,7 +486,7 @@ cmd_menu() {
             ;;
           send)
             local pane_selected="" pane_selected_label=""
-            _pick_pane "Send text to Claude pane"
+            _pick_pane "Send text to agent pane"
             if [ -n "$pane_selected" ]; then
               tput cnorm 2>/dev/null
               clear
@@ -493,7 +504,7 @@ cmd_menu() {
             ;;
           read)
             local pane_selected="" pane_selected_label=""
-            _pick_pane "Read output from Claude pane"
+            _pick_pane "Read output from agent pane"
             if [ -n "$pane_selected" ]; then
               tput cnorm 2>/dev/null
               tmux capture-pane -t "$pane_selected" -p -S -100 | less
@@ -502,12 +513,12 @@ cmd_menu() {
             ;;
           refresh)
             local pane_selected="" pane_selected_label=""
-            _pick_pane "Refresh Claude (select pane)"
+            _pick_pane "Refresh agent (select pane)"
             if [ -n "$pane_selected" ]; then
               tput cnorm 2>/dev/null
               clear
               echo "  Refresh: ${pane_selected_label}"
-              echo "  This will restart claude with the latest version."
+              echo "  This will restart the agent with the latest version."
               echo ""
               read -p "  Confirm (y/N): " confirm
               if [ "$confirm" = "y" ] || [ "$confirm" = "Y" ]; then
@@ -520,7 +531,7 @@ cmd_menu() {
             ;;
           kill)
             local pane_selected="" pane_selected_label=""
-            _pick_pane "Kill Claude pane (select pane)"
+            _pick_pane "Kill agent pane (select pane)"
             if [ -n "$pane_selected" ]; then
               tput cnorm 2>/dev/null
               clear
@@ -537,7 +548,7 @@ cmd_menu() {
             ;;
           split)
             local pane_selected="" pane_selected_label=""
-            _pick_pane "Split Claude workspace (select pane)"
+            _pick_pane "Split agent workspace (select pane)"
             if [ -n "$pane_selected" ]; then
               tput cnorm 2>/dev/null
               local target_win
@@ -574,7 +585,7 @@ cmd_menu() {
 }
 
 # Interactive picker with arrow keys and j/k vim bindings
-# Operates at the pane level so every Claude pane is individually selectable.
+# Operates at the pane level so every claude/pi pane is individually selectable.
 cmd_pick() {
   local current_pane="${1:-}"
 
@@ -597,29 +608,22 @@ cmd_pick() {
       win_name=$(basename "$pane_cwd")
     fi
 
-    # Check if this pane is running claude
-    if ! ps -u "$USER" -o ppid,comm 2>/dev/null | grep -q "^ *${pane_pid} .*claude"; then
-      continue
-    fi
+    # Check if this pane is running claude or pi
+    local agent
+    agent=$(cmux_pane_agent "$pane_pid") || continue
 
-    local status="active"
-    local last_line
-    last_line=$(tmux capture-pane -t "$pane_id" -p -S -3 2>/dev/null | grep -v '^$' | tail -1)
-    if echo "$last_line" | grep -qE '⠋|⠙|⠹|⠸|⠼|⠴|⠦|⠧|⠇|⠏|Thinking|Reading|Writing|Running'; then
-      status="working"
-    elif echo "$last_line" | grep -qE '^\$|^\>|y/n|Y/n|approve|deny'; then
-      status="waiting"
-    fi
+    local status
+    status=$(cmux_pane_status "$pane_id")
 
     pane_ids+=("$pane_id")
-    pane_labels+=("${win_idx}:${pane_idx} ${win_name}")
+    pane_labels+=("${win_idx}:${pane_idx} [$(cmux_agent_label "$agent")] ${win_name}")
     pane_cwds+=("${pane_cwd/#$HOME/~}")
     pane_statuses+=("$status")
   done < <(tmux list-panes -a -F '#{pane_id}|#{window_index}|#{window_name}|#{pane_index}|#{pane_pid}|#{pane_current_path}' 2>/dev/null)
 
   local count=${#pane_ids[@]}
   if [ "$count" -eq 0 ]; then
-    echo "No Claude panes found."
+    echo "No agent panes found."
     read -rsn1 -p "Press any key to close..."
     return
   fi
@@ -638,10 +642,10 @@ cmd_pick() {
 
   _draw() {
     clear
-    echo "  Claude Panes (j/k or arrows to move, Enter to select, q/Esc to cancel)"
+    echo "  Agent Panes (j/k or arrows to move, Enter to select, q/Esc to cancel)"
     echo "  ──────────────────────────────────────────────────────────────────────────"
     echo ""
-    printf "    %-12s %-22s %-38s %-10s\n" "Win:Pane" "Name" "Directory" "Status"
+    printf "    %-10s %-27s %-38s %-10s\n" "Win:Pane" "Name" "Directory" "Status"
     echo "    ────────────────────────────────────────────────────────────────────────"
     for i in $(seq 0 $((count - 1))); do
       local prefix="    "
@@ -656,10 +660,10 @@ cmd_pick() {
 
       if [ "$i" -eq "$selected" ]; then
         prefix="  \033[7m>"
-        printf "${prefix} %-12s %-22s %-38s ${status_color}%-10s${reset}\033[0m\n" \
+        printf "${prefix} %-10s %-27s %-38s ${status_color}%-10s${reset}\033[0m\n" \
           "${pane_labels[$i]%% *}" "${pane_labels[$i]#* }" "${pane_cwds[$i]}" "${pane_statuses[$i]}"
       else
-        printf "${prefix} %-12s %-22s %-38s ${status_color}%-10s${reset}\n" \
+        printf "${prefix} %-10s %-27s %-38s ${status_color}%-10s${reset}\n" \
           "${pane_labels[$i]%% *}" "${pane_labels[$i]#* }" "${pane_cwds[$i]}" "${pane_statuses[$i]}"
       fi
     done
@@ -716,11 +720,13 @@ cmd_prompt_new() {
     initial_list=$(printf '%s\n' "$initial_list"; ls -1dt "$CLAUDE_DIR"/*/ 2>/dev/null | while read -r d; do basename "$d"; done)
   fi
 
-  # Run fzf with dynamic reload for path completion
+  # Run fzf with dynamic reload for path completion.
+  # Enter launches claude (the default); ctrl-p launches the same selection with pi.
   local result
   result=$(echo "$initial_list" | fzf \
     --print-query \
-    --header='Type name (fuzzy match) or path (/ ~ ./ for dirs) | Esc to cancel' \
+    --expect=ctrl-p \
+    --header='Type name (fuzzy match) or path (/ ~ ./ for dirs) | Enter=claude  ctrl-p=pi  Esc=cancel' \
     --prompt='Workspace: ' \
     --height=100% \
     --layout=reverse \
@@ -730,11 +736,16 @@ cmd_prompt_new() {
       item={};
       query={q};
       if [ \"\$item\" = '+ New session' ]; then
-        echo 'Launch unnamed Claude session in ~/';
+        echo 'Launch unnamed session in a fresh dated workspace';
       elif [ -n \"\$item\" ]; then
         # Selected an item from the list
         if [ -d \"$CLAUDE_DIR/\$item\" ]; then
           echo \"Existing workspace: $CLAUDE_DIR/\$item\";
+          if [ -f \"$CLAUDE_DIR/\$item/${CMUX_AGENT_MARKER}\" ]; then
+            echo \"Agent: \$(cat \"$CLAUDE_DIR/\$item/${CMUX_AGENT_MARKER}\") (resumes with this unless you press ctrl-p)\";
+          else
+            echo 'Agent: claude (no marker)';
+          fi;
           echo '';
           ls -lt \"$CLAUDE_DIR/\$item\" 2>/dev/null | head -10;
         elif [ -d \"\${item/#\\~/$HOME}\" ]; then
@@ -752,35 +763,44 @@ cmd_prompt_new() {
         else
           echo \"New workspace: $CLAUDE_DIR/\$(date +%Y%m%d)_\$query\";
         fi;
-      fi
+      fi;
+      echo '';
+      echo 'Enter = claude   ctrl-p = pi';
     " \
     --preview-window=right:40%:wrap \
   ) || true
 
-  # fzf --print-query outputs: line 1 = query, line 2 = selected item (if any)
-  local query selected
+  # With --print-query --expect, fzf outputs:
+  #   line 1 = query, line 2 = pressed key ("" for plain Enter), line 3 = selection
+  local query key selected
   query=$(echo "$result" | sed -n '1p')
-  selected=$(echo "$result" | sed -n '2p')
+  key=$(echo "$result" | sed -n '2p')
+  selected=$(echo "$result" | sed -n '3p')
 
   # Nothing entered and nothing selected — cancelled or empty
   if [ -z "$query" ] && [ -z "$selected" ]; then
     return
   fi
 
+  local agent="$CMUX_DEFAULT_AGENT"
+  [ "$key" = "ctrl-p" ] && agent="pi"
+
   # "+ New session" selected or empty query with it highlighted → unnamed session
   if [ "$selected" = "+ New session" ] && [ -z "$query" ]; then
-    cmd_new ""
+    cmd_new "" "$agent"
     return
   fi
 
   # Determine what to launch
   local input="${selected:-$query}"
 
-  # If selected item is an existing workspace dir name — resume session
+  # If selected item is an existing workspace dir name — resume session.
+  # Without an explicit ctrl-p, resume with whichever agent created it.
   if [ -n "$selected" ] && [ -d "$CLAUDE_DIR/$selected" ]; then
     local name
     name=$(echo "$selected" | sed 's/^[0-9]*_//')
-    _launch_workspace "$name" "$CLAUDE_DIR/$selected" resume
+    [ "$key" != "ctrl-p" ] && agent=$(cmux_read_marker "$CLAUDE_DIR/$selected")
+    _launch_workspace "$name" "$CLAUDE_DIR/$selected" resume "$agent"
     return
   fi
 
@@ -791,12 +811,12 @@ cmd_prompt_new() {
     local name
     name=$(basename "$dir")
     mkdir -p "$dir"
-    _launch_workspace "$name" "$dir"
+    _launch_workspace "$name" "$dir" "" "$agent"
     return
   fi
 
   # Plain name — delegate to cmd_new which handles dated subfolder creation
-  cmd_new "$input"
+  cmd_new "$input" "$agent"
 }
 
 case "${1:-}" in
@@ -818,13 +838,13 @@ case "${1:-}" in
     echo "Usage: workspace.sh <command> [args...]"
     echo ""
     echo "Commands:"
-    echo "  new [name] [dir]       Create a new Claude Code workspace"
-    echo "  list                   List all Claude Code workspaces"
+    echo "  new [name] [agent]     Create a new workspace (agent: claude|pi, default claude)"
+    echo "  list                   List all agent workspaces"
     echo "  pick                   Interactive workspace picker"
-    echo "  send <win> <text>      Send text to Claude in window"
-    echo "  send-key <win> <key>   Send a key to Claude in window"
-    echo "  read <win> [lines]     Read Claude's output"
-    echo "  kill <win>             Kill a Claude workspace"
+    echo "  send <win> <text>      Send text to the agent in window"
+    echo "  send-key <win> <key>   Send a key to the agent in window"
+    echo "  read <win> [lines]     Read the agent's output"
+    echo "  kill <win>             Kill an agent workspace"
     echo "  focus <win>            Switch to workspace (clears notifications)"
     echo "  split <win> [dir]      Add split pane (left/right/up/down)"
     echo "  notify <win> <msg>     Send notification for workspace"

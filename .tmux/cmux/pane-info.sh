@@ -6,6 +6,10 @@
 
 PANE_ID="${1:-}"
 
+CMUX_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=agent.sh
+. "${CMUX_DIR}/agent.sh"
+
 if [ -n "$PANE_ID" ]; then
   PANE_PID=$(tmux display-message -t "$PANE_ID" -p '#{pane_pid}')
   PANE_CWD=$(tmux display-message -t "$PANE_ID" -p '#{pane_current_path}')
@@ -43,16 +47,23 @@ if [ -n "$PANE_PID" ]; then
       ss -tlnp 2>/dev/null | grep "pid=${pid}," | awk '{print $4}' | grep -oE '[0-9]+$'
     done | sort -un | tr '\n' ',' | sed 's/,$//')
   elif command -v lsof >/dev/null 2>&1; then
-    local pid_csv
+    # Not inside a function — plain assignment, no `local`.
     pid_csv=$(echo "$ALL_PIDS" | tr '\n' ',' | sed 's/,$//')
     PORTS=$(lsof -nP -iTCP -sTCP:LISTEN -a -p "$pid_csv" 2>/dev/null | awk 'NR>1 {split($9,a,":"); print a[length(a)]}' | sort -un | tr '\n' ',' | sed 's/,$//')
   fi
 fi
 
+# Which agent is running here
+AGENT=$(cmux_pane_agent "$PANE_PID" 2>/dev/null)
+
 # Build output
 OUTPUT=""
+case "$AGENT" in
+  pi)     OUTPUT="#[fg=colour215]pi#[default] " ;;
+  claude) OUTPUT="#[fg=colour156]cl#[default] " ;;
+esac
 if [ -n "$GIT_BRANCH" ]; then
-  OUTPUT="#[fg=colour114]${GIT_BRANCH}#[default]"
+  OUTPUT="${OUTPUT}#[fg=colour114]${GIT_BRANCH}#[default]"
 fi
 OUTPUT="${OUTPUT} #[fg=colour246]${SHORT_CWD}#[default]"
 if [ -n "$PORTS" ]; then

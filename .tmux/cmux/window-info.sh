@@ -42,7 +42,7 @@ if [ -n "$PANE_PID" ]; then
       ss -tlnp 2>/dev/null | grep "pid=${pid}," | awk '{print $4}' | grep -oE '[0-9]+$'
     done | sort -un | head -3 | tr '\n' ',' | sed 's/,$//')
   elif command -v lsof >/dev/null 2>&1; then
-    local pid_csv
+    # Not inside a function — plain assignment, no `local`.
     pid_csv=$(echo "$ALL_PIDS" | tr '\n' ',' | sed 's/,$//')
     PORTS=$(lsof -nP -iTCP -sTCP:LISTEN -a -p "$pid_csv" 2>/dev/null | awk 'NR>1 {split($9,a,":"); print a[length(a)]}' | sort -un | head -3 | tr '\n' ',' | sed 's/,$//')
   fi
