@@ -119,21 +119,32 @@ status_watcher() {
 
 _run_watcher() {
   # Per-pane memory:
-  #   settled      — the pane showed idle on the PREVIOUS tick.
   #   seen_settled — the pane has been observed idle at least once since
   #                  first sight/reseed. Until then, working ticks don't
   #                  latch: startup output and watcher restarts are never
   #                  news.
   #   saw_work     — the finish latch: set by an observed working tick once
-  #                  seen_settled holds; cleared by the first idle tick after
-  #                  it, which is the one finish notification. Idle hash
-  #                  churn can never set it, so no notify storm is possible.
+  #                  seen_settled holds; cleared when the quiet streak
+  #                  completes, which is the one finish notification. Idle
+  #                  hash churn can never set it, so no notify storm is
+  #                  possible.
+  #   idle_streak  — consecutive quiet idle ticks; must reach QUIET_TICKS
+  #                  before the finish fires, and any output churn resets it.
+  #   out_hash     — previous tick's output hash, only for churn detection.
   #   w/h/grace    — pane geometry and redraw-grace ticks; see below.
-  declare -A settled seen_settled saw_work out_hash w h grace
+  declare -A seen_settled saw_work idle_streak out_hash w h grace
 
   # Ticks after a geometry change that can't count as work (capture-pane and
   # list-panes can straddle the resize, so the reflow may surface next tick).
   local REDRAW_GRACE=1
+  # Consecutive quiet idle ticks required before a latched finish notifies.
+  # Two only debounced render gaps; four still fired inside auto-resume
+  # chains: background task/monitor events re-invoke the session 10-16s
+  # after a turn ends, and a notify inside that gap reads as premature
+  # (the user switches over and the session is visibly working again).
+  # Six ticks (~18-21s of true quiet) covers the observed chain gaps; a
+  # finish on a genuinely idle pane just notifies ~20s later.
+  local QUIET_TICKS=6
   # Lines at the bottom of the pane that belong to the input box + footer +
   # statusline. Captured but excluded from the output inspection.
   local INPUT_TAIL_LINES=3
@@ -159,7 +170,7 @@ _run_watcher() {
       # cross-notify on other users' shells.
       local agent
       if ! agent=$(cmux_pane_agent "$pane_pid"); then
-        unset "settled[$pane_id]" "saw_work[$pane_id]" "seen_settled[$pane_id]"
+        unset "saw_work[$pane_id]" "seen_settled[$pane_id]" "idle_streak[$pane_id]"
         unset "out_hash[$pane_id]" "w[$pane_id]" "h[$pane_id]" "grace[$pane_id]"
         continue
       fi
@@ -168,9 +179,9 @@ _run_watcher() {
       # no agent action — the pane can't be classified meaningfully while
       # it's active. Re-seed and skip, so paging can't fabricate a finish.
       if [ "$pane_mode" = "1" ]; then
-        settled[$pane_id]=""
         seen_settled[$pane_id]=""
         saw_work[$pane_id]=""
+        idle_streak[$pane_id]=0
         out_hash[$pane_id]=""
         grace[$pane_id]=$REDRAW_GRACE
         w[$pane_id]="$width"
@@ -197,9 +208,9 @@ _run_watcher() {
       if [ -n "${w[$pane_id]:-}" ] && { [ "${w[$pane_id]}" != "$width" ] || [ "${h[$pane_id]}" != "$height" ]; }; then
         redraw=1
         grace[$pane_id]=$REDRAW_GRACE
-        settled[$pane_id]=""
         seen_settled[$pane_id]=""
         saw_work[$pane_id]=""
+        idle_streak[$pane_id]=0
         out_hash[$pane_id]=""
       fi
       w[$pane_id]="$width"
@@ -242,7 +253,7 @@ _run_watcher() {
       # Output churn HOLD, not evidence: a hash change can never arm the
       # finish latch (that re-arm loop was the notify storm), but churn
       # observed while a work phase is latched means the turn is still
-      # moving — it resets the idle debounce so a classifier miss streak
+      # moving — it resets the quiet streak so a classifier miss streak
       # (status line pushed out of the capture by a growing bottom UI)
       # can't fire the finish mid-turn. Between turns (idle, latch clear)
       # churn does nothing.
@@ -253,21 +264,21 @@ _run_watcher() {
         churn=1
       fi
       if [ "$churn" -eq 1 ] && [ -n "${saw_work[$pane_id]:-}" ]; then
-        settled[$pane_id]=""
+        idle_streak[$pane_id]=0
       fi
 
       # The finish latch (this replaced hash-diff "work evidence", which
       # re-armed on every idle tick with output churn and storm-notified).
-      local was_settled=0
-      [ -n "${settled[$pane_id]:-}" ] && was_settled=1
       if [ "$idle" -eq 1 ]; then
         seen_settled[$pane_id]="1"
-        # Debounce: the finish fires only on the SECOND consecutive idle
-        # tick (was_settled = idle was observed on the previous tick too).
-        # A single idle-looking frame mid-work (transient status-line render
-        # gap) must not spend the latch; a real finish persists across ticks.
-        if [ "$was_settled" -eq 1 ] && [ -n "${saw_work[$pane_id]:-}" ]; then
-          # Observed work → two observed idle ticks: this IS the finish. The
+        # Quiet streak: the finish fires only after QUIET_TICKS consecutive
+        # idle ticks with no output churn. Shorter windows fired mid-turn
+        # (status-line render gaps) and inside auto-resume chains (a
+        # background event re-invokes the session seconds after a turn).
+        local streak=$(( ${idle_streak[$pane_id]:-0} + 1 ))
+        idle_streak[$pane_id]=$streak
+        if [ "$streak" -ge "$QUIET_TICKS" ] && [ -n "${saw_work[$pane_id]:-}" ]; then
+          # Observed work → sustained quiet: this IS the finish. The
           # latch clears here, so a finish notifies at most once per phase.
           saw_work[$pane_id]=""
           if [ -n "${visible[${win_idx}|${sess_name}]:-}" ]; then
@@ -278,9 +289,8 @@ _run_watcher() {
             _notify "$win_name" "$win_idx" "$agent"
           fi
         fi
-        settled[$pane_id]=1
       else
-        settled[$pane_id]=""
+        idle_streak[$pane_id]=0
         # Working tick. Latches as a work phase only after the pane has been
         # seen idle once since first sight — startup output is not work.
         if [ -n "${seen_settled[$pane_id]:-}" ]; then
