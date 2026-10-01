@@ -45,6 +45,14 @@ CMUX_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=agent.sh
 . "${CMUX_DIR}/agent.sh"
 
+_hash() {
+  if command -v md5 >/dev/null 2>&1; then
+    md5
+  else
+    md5sum | cut -d' ' -f1
+  fi
+}
+
 _notify() {
   local win_name="$1" win_idx="$2" agent="${3:-claude}"
   # tmux status message (always)
@@ -121,7 +129,7 @@ _run_watcher() {
   #                  it, which is the one finish notification. Idle hash
   #                  churn can never set it, so no notify storm is possible.
   #   w/h/grace    — pane geometry and redraw-grace ticks; see below.
-  declare -A settled seen_settled saw_work w h grace
+  declare -A settled seen_settled saw_work out_hash w h grace
 
   # Ticks after a geometry change that can't count as work (capture-pane and
   # list-panes can straddle the resize, so the reflow may surface next tick).
@@ -152,7 +160,7 @@ _run_watcher() {
       local agent
       if ! agent=$(cmux_pane_agent "$pane_pid"); then
         unset "settled[$pane_id]" "saw_work[$pane_id]" "seen_settled[$pane_id]"
-        unset "w[$pane_id]" "h[$pane_id]" "grace[$pane_id]"
+        unset "out_hash[$pane_id]" "w[$pane_id]" "h[$pane_id]" "grace[$pane_id]"
         continue
       fi
 
@@ -163,6 +171,7 @@ _run_watcher() {
         settled[$pane_id]=""
         seen_settled[$pane_id]=""
         saw_work[$pane_id]=""
+        out_hash[$pane_id]=""
         grace[$pane_id]=$REDRAW_GRACE
         w[$pane_id]="$width"
         h[$pane_id]="$height"
@@ -175,6 +184,10 @@ _run_watcher() {
       local all_lines out_lines
       all_lines=$(tmux capture-pane -t "$pane_id" -p -S -"$CAPTURE_LINES" 2>/dev/null | tail -"$CAPTURE_LINES")
       out_lines=$(echo "$all_lines" | awk -v n="$INPUT_TAIL_LINES" '{ln[NR]=$0} END{for(i=1;i<=NR-n;i++) print ln[i]}')
+      # Output churn hash: used only to HOLD an already-latched working
+      # phase through classifier misses (see below), never as evidence.
+      local content_hash
+      content_hash=$(printf '%s' "$out_lines" | grep -vE -- 'tokens:[0-9]|-- INSERT --|-- NORMAL --' | tr -d '[:space:]' | _hash)
 
       # Redraw detection: resize or pane switch reflows content with no agent
       # action, and the classification of the reflowed frame is unreliable.
@@ -187,6 +200,7 @@ _run_watcher() {
         settled[$pane_id]=""
         seen_settled[$pane_id]=""
         saw_work[$pane_id]=""
+        out_hash[$pane_id]=""
       fi
       w[$pane_id]="$width"
       h[$pane_id]="$height"
@@ -224,6 +238,23 @@ _run_watcher() {
       fi
       local idle=0
       [ "$working" -eq 0 ] && idle=1
+
+      # Output churn HOLD, not evidence: a hash change can never arm the
+      # finish latch (that re-arm loop was the notify storm), but churn
+      # observed while a work phase is latched means the turn is still
+      # moving — it resets the idle debounce so a classifier miss streak
+      # (status line pushed out of the capture by a growing bottom UI)
+      # can't fire the finish mid-turn. Between turns (idle, latch clear)
+      # churn does nothing.
+      local prev_hash="${out_hash[$pane_id]:-}"
+      out_hash[$pane_id]="$content_hash"
+      local churn=0
+      if [ -n "$prev_hash" ] && [ "$content_hash" != "$prev_hash" ] && [ "$redraw" -eq 0 ]; then
+        churn=1
+      fi
+      if [ "$churn" -eq 1 ] && [ -n "${saw_work[$pane_id]:-}" ]; then
+        settled[$pane_id]=""
+      fi
 
       # The finish latch (this replaced hash-diff "work evidence", which
       # re-armed on every idle tick with output churn and storm-notified).
